@@ -65,7 +65,7 @@ typedef struct tdl_point_color
 typedef struct tdl_buffer_point
 {
   tdl_utf8char_t character;
-  unsigned int attributes;
+  tdl_textattr_t attributes;
   tdl_point_color_t color;
 } tdl_buffer_point_t;
 
