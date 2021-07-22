@@ -30,10 +30,8 @@ int tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
 int tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
-int tdl_set_color (tdl_canvas_t *canv, tdl_point_color_t color);
-int tdl_set_attributes (tdl_canvas_t *canv, tdl_textattr_t tattr);
 
-int tdl_print (tdl_canvas_t *canv, char *str);
+int tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 
 /* 3.1. Functions for drawing shapes */
 int tdl_draw_line (tdl_canvas_t *canv, tdl_line_t line);

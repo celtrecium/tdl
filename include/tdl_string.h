@@ -16,18 +16,13 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_ATTRIBUTES_H
-#define TDL_ATTRIBUTES_H
+#ifndef TDL_STRING_H
+#define TDL_STRING_H
 
 #include "tdl_objects.h"
 
-#define TDL_NO_ATTRIBUTES 0
-#define TDL_BOLD          1
-#define TDL_ITALIC        2
-#define TDL_UNDERLINE     4
-#define TDL_CROSSED_OUT   8
-#define TDL_DIM           16
+tdl_string_t tdl_string (char *string);
+int tdl_string_free (tdl_string_t str);
+tdl_string_t tdl_string_set (tdl_string_t string, char *newstr);
 
-tdl_point_color_t tdl_point_color (tdl_color_t bg, tdl_color_t fg);
-
-#endif  /* TDL_ATTRIBUTES_H */
+#endif  /* TDL_STRING_H */
