@@ -21,8 +21,9 @@
 
 #include "tdl_objects.h"
 
+size_t tdl_strlen (char *string);
 tdl_string_t tdl_string (char *string);
 int tdl_string_free (tdl_string_t str);
-tdl_string_t tdl_string_set (tdl_string_t string, char *newstr);
+tdl_string_t tdl_string_set (tdl_string_t *string, char *newstr);
 
 #endif  /* TDL_STRING_H */
