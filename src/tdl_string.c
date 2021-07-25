@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl_string.h"
+#include "../include/tdl_string.h"
 #include <string.h>
 
 #define UTF8_CODEPOINT_4B 0xF0
