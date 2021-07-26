@@ -5,4 +5,4 @@ TDL is a library for drawing with text using user-friendly API
 Currently under development...
 
 ## Dependencies
-* [libu8string](https://github.com/celtrecium/celtrecium/libu8string)
+* [libu8string](https://github.com/celtrecium/libu8string)
