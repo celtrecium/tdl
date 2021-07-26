@@ -22,9 +22,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <u8string.h>
 
 typedef unsigned int tdl_color_t;
-typedef char tdl_utf8char_t[4];
 
 typedef enum tdl_attributes
 {
@@ -78,7 +78,7 @@ typedef struct tdl_style
 
 typedef struct tdl_buffer_point
 {
-  tdl_utf8char_t character;
+  u8char_t character;
   tdl_style_t style;
 } tdl_buffer_point_t;
 
@@ -96,15 +96,9 @@ typedef struct tdl_ldiff_arr
   size_t last_index;
 } tdl_ldiff_arr_t;
 
-typedef struct tdl_string
-{
-  tdl_utf8char_t *string;
-  size_t length;
-} tdl_string_t;
-
 typedef struct tdl_text_t
 {
-  tdl_string_t string;
+  u8string_t string;
   tdl_style_t style;
 } tdl_text_t;
 
