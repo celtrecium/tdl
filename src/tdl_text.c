@@ -16,48 +16,25 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl_geometry.h"
+#include "tdl_text.h"
+#include <string.h>
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
+tdl_text_t
+tdl_text (u8string_t string, tdl_style_t style)
 {
-  tdl_line_t line;
+  tdl_text_t text;
 
-  line.a = point_a;
-  line.b = point_b;
+  text.string = string;
+  text.style = style;
 
-  return line;
+  return text;
 }
 
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
+int
+tdl_text_free (tdl_text_t text)
 {
-  tdl_rectangle_t rect;
-
-  rect.point = point;
-  rect.size = size;
-
-  return rect;
-}
-
-tdl_point_t
-tdl_point (int x, int y)
-{
-  tdl_point_t point;
-
-  point.x = x;
-  point.y = y;
-
-  return point;
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  tdl_size_t size;
-
-  size.height = height;
-  size.width = width;
-
-  return size;
+  u8string_free (&text.string);
+  memset (&text.style, 0, sizeof (tdl_style_t));
+  
+  return EXIT_SUCCESS;
 }

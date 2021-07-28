@@ -16,48 +16,47 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl_geometry.h"
+#include "tdl_style.h"
+#include <stdarg.h>
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
+tdl_point_color_t
+tdl_point_color (tdl_color_t bg, tdl_color_t fg)
 {
-  tdl_line_t line;
+  tdl_point_color_t pcolor;
 
-  line.a = point_a;
-  line.b = point_b;
+  pcolor.bg = bg;
+  pcolor.fg = fg;
 
-  return line;
+  return pcolor;
 }
 
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
+tdl_attributes_t
+__tdl_attributes_intern (tdl_attributes_t attrs, ...)
 {
-  tdl_rectangle_t rect;
+  tdl_attributes_t retattrs = 0;
+  tdl_attributes_t attr = 0;
+  va_list lst;
 
-  rect.point = point;
-  rect.size = size;
+  va_start (lst, attrs);
 
-  return rect;
+  while (attr != _LAST_STYLES_ARG)
+    {
+      retattrs |= attr;
+      attr = va_arg (lst, tdl_attributes_t);
+    }
+    
+  va_end (lst);
+  
+  return retattrs;
 }
 
-tdl_point_t
-tdl_point (int x, int y)
+tdl_style_t
+tdl_style (tdl_point_color_t color, tdl_attributes_t attrs)
 {
-  tdl_point_t point;
+  tdl_style_t style;
 
-  point.x = x;
-  point.y = y;
+  style.attributes = attrs;
+  style.color = color;
 
-  return point;
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  tdl_size_t size;
-
-  size.height = height;
-  size.width = width;
-
-  return size;
+  return style;
 }
