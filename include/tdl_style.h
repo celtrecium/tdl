@@ -21,8 +21,13 @@
 
 #include "tdl_objects.h"
 
+#define _LAST_STYLES_ARG 17
+
 tdl_point_color_t tdl_point_color (tdl_color_t bg, tdl_color_t fg);
-tdl_attributes_t tdl_attributes (tdl_attributes_t attrs, ...);
+tdl_attributes_t __tdl_attributes_intern (tdl_attributes_t attrs, ...);
 tdl_style_t tdl_style (tdl_point_color_t color, tdl_attributes_t attrs);
+
+#define tdl_attributes(...) \
+  __tdl_attributes_intern (__VA_ARGS__, _LAST_STYLES_ARG)
 
 #endif  /* TDL_STYLE_H */

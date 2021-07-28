@@ -21,7 +21,7 @@
 
 #include "tdl_objects.h"
 
-tdl_text_t tdl_text (char *string, tdl_style_t style);
+tdl_text_t tdl_text (u8string_t string, tdl_style_t style);
 int tdl_text_free (tdl_text_t text);
 
 #endif  /* TDL_TEXT_H */
