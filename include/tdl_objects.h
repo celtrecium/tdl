@@ -98,7 +98,7 @@ typedef struct tdl_ldiff_arr
 
 typedef struct tdl_text_t
 {
-  u8string_t string;
+  u8string_t *string;
   tdl_style_t style;
 } tdl_text_t;
 
