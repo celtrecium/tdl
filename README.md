@@ -6,3 +6,4 @@ Currently under development...
 
 ## Dependencies
 * [libu8string](https://github.com/celtrecium/libu8string)
+* [libsbvector](https://github.com/celtrecium/libsbvector)
