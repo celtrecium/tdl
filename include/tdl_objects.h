@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <u8string.h>
+#include <sbvector.h>
 
 typedef unsigned int tdl_color_t;
 
@@ -89,13 +90,6 @@ typedef struct tdl_ldiff
   size_t last_modified;
 } tdl_ldiff_t;
 
-typedef struct tdl_ldiff_arr
-{
-  tdl_ldiff_t *listdiffs;
-  size_t size;
-  size_t last_index;
-} tdl_ldiff_arr_t;
-
 typedef struct tdl_text_t
 {
   u8string_t *string;
@@ -107,8 +101,8 @@ typedef struct tdl_canvas
   tdl_point_t cursor;
   tdl_size_t size;
   tdl_error_t err;
-  tdl_buffer_point_t **buffer;
-  tdl_ldiff_arr_t diff;
+  sbvector_t buffer;
+  sbvector_t diff;
 } tdl_canvas_t;
 
 #endif /* TDL_H */

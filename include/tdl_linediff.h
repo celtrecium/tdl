@@ -22,9 +22,5 @@
 #include "tdl_objects.h"
 
 tdl_ldiff_t tdl_ldiff (size_t line, size_t first_m, size_t last_m);
-tdl_ldiff_arr_t tdl_ldiff_arr (void);
-int tdl_ldiff_arr_push (tdl_ldiff_arr_t ldarr, tdl_ldiff_t ldiff);
-int tdl_ldiff_arr_clear (tdl_ldiff_arr_t ldarr);
-int tdl_ldiff_arr_free (tdl_ldiff_arr_t ldarr);
 
 #endif  /* TDL_LINEDIFF_H */
