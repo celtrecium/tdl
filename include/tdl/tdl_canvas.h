@@ -16,18 +16,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_STYLE_H
-#define TDL_STYLE_H
+
+#ifndef TDL_CANVAS_H
+#define TDL_CANVAS_H
 
 #include "tdl_objects.h"
 
-#define _LAST_STYLES_ARG 17
+/* This header contains methods for canvas structure */
 
-tdl_point_color_t tdl_point_color (tdl_color_t bg, tdl_color_t fg);
-tdl_attributes_t __tdl_attributes_intern (tdl_attributes_t attrs, ...);
-tdl_style_t tdl_style (tdl_point_color_t color, tdl_attributes_t attrs);
+/* 1. Create/destroy canvas functions */
+tdl_canvas_t *tdl_create_canvas (void);
+int tdl_destroy_canvas (tdl_canvas_t *canv);
 
-#define tdl_attributes(...) \
-  __tdl_attributes_intern (__VA_ARGS__, _LAST_STYLES_ARG)
+/* 2. Canvas setters */
+int tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
+int tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 
-#endif  /* TDL_STYLE_H */
+#endif /* TDL_CANVAS_H */

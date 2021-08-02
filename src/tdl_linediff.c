@@ -16,8 +16,9 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "../include/tdl_linediff.h"
-#include <sbvector.h>
+#include "tdl/tdl_linediff.h"
+#include "tdl/tdl_objects.h"
+#include <stdlib.h>
 
 tdl_ldiff_t
 tdl_ldiff (size_t line, size_t first_m, size_t last_m)
@@ -29,4 +30,18 @@ tdl_ldiff (size_t line, size_t first_m, size_t last_m)
   ldiff.line_number = line;
 
   return ldiff;
+}
+
+int
+tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified)
+{
+  if (ldiff == NULL)
+    return EXIT_FAILURE;
+
+  if (modified > ldiff->last_modified)
+    ldiff->last_modified = modified;
+  else if (modified < ldiff->first_modified)
+    ldiff->first_modified = modified;
+
+  return EXIT_SUCCESS;
 }

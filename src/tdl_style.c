@@ -16,8 +16,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl_style.h"
+#include "tdl/tdl_style.h"
+#include "tdl/tdl_objects.h"
 #include <stdarg.h>
+#include <string.h>
 
 tdl_point_color_t
 tdl_point_color (tdl_color_t bg, tdl_color_t fg)
@@ -33,12 +35,12 @@ tdl_point_color (tdl_color_t bg, tdl_color_t fg)
 tdl_attributes_t
 __tdl_attributes_intern (tdl_attributes_t attrs, ...)
 {
-  tdl_attributes_t retattrs = 0;
+  tdl_attributes_t retattrs = attrs;
   tdl_attributes_t attr = 0;
   va_list lst;
 
   va_start (lst, attrs);
-
+  
   while (attr != _LAST_STYLES_ARG)
     {
       retattrs |= attr;
@@ -55,8 +57,24 @@ tdl_style (tdl_point_color_t color, tdl_attributes_t attrs)
 {
   tdl_style_t style;
 
+  memset (&style, 0, sizeof (tdl_style_t));
+
   style.attributes = attrs;
   style.color = color;
 
   return style;
+}
+
+bool
+tdl_style_compare (tdl_style_t *first, tdl_style_t *second)
+{
+  if (first == NULL && second == NULL)
+    return true;
+  else if (first == NULL || second == NULL)
+    return false;
+
+  if (memcmp (first, second, sizeof (tdl_style_t)) == 0)
+    return true;
+  else
+    return false;
 }

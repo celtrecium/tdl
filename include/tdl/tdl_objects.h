@@ -30,11 +30,11 @@ typedef unsigned int tdl_color_t;
 typedef enum tdl_attributes
 {
   TDL_NO_ATTRIBUTES = 0,
-  TDL_BOLD = 1,
-  TDL_ITALIC = 2,
-  TDL_UNDERLINE = 4,
-  TDL_CROSSED_OUT = 8,
-  TDL_DIM = 16
+  TDL_BOLD =          1,
+  TDL_ITALIC =        1 << 1,
+  TDL_UNDERLINE =     1 << 2,
+  TDL_CROSSED_OUT =   1 << 3,
+  TDL_DIM =           1 << 4
 } tdl_attributes_t;
 
 typedef enum tdl_error

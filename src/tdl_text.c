@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl_text.h"
+#include "tdl/tdl_text.h"
 #include <string.h>
 
 tdl_text_t

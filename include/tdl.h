@@ -16,48 +16,15 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef TDL_H
+#define TDL_H
+
+#include "tdl/tdl_canvas.h"
 #include "tdl/tdl_geometry.h"
+#include "tdl/tdl_objects.h"
+#include "tdl/tdl_style.h"
+#include "tdl/tdl_text.h"
+#include "tdl/tdl_shapes.h"
+#include "tdl/tdl_display.h"
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
-{
-  tdl_line_t line;
-
-  line.a = point_a;
-  line.b = point_b;
-
-  return line;
-}
-
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
-{
-  tdl_rectangle_t rect;
-
-  rect.point = point;
-  rect.size = size;
-
-  return rect;
-}
-
-tdl_point_t
-tdl_point (int x, int y)
-{
-  tdl_point_t point;
-
-  point.x = x;
-  point.y = y;
-
-  return point;
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  tdl_size_t size;
-
-  size.height = height;
-  size.width = width;
-
-  return size;
-}
+#endif  /* TDL_H */

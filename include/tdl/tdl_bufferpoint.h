@@ -16,48 +16,13 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_geometry.h"
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
-{
-  tdl_line_t line;
+#ifndef TDL_BUFFERPOINT_H
+#define TDL_BUFFERPOINT_H
 
-  line.a = point_a;
-  line.b = point_b;
+#include "tdl_objects.h"
 
-  return line;
-}
+tdl_buffer_point_t tdl_buffer_point (u8char_t uchar, tdl_style_t style);
+int tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src);
 
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
-{
-  tdl_rectangle_t rect;
-
-  rect.point = point;
-  rect.size = size;
-
-  return rect;
-}
-
-tdl_point_t
-tdl_point (int x, int y)
-{
-  tdl_point_t point;
-
-  point.x = x;
-  point.y = y;
-
-  return point;
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  tdl_size_t size;
-
-  size.height = height;
-  size.width = width;
-
-  return size;
-}
+#endif /* TDL_BUFFERPOINT_H */

@@ -16,48 +16,33 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_geometry.h"
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
+#include "tdl/tdl_bufferpoint.h"
+#include <string.h>
+
+tdl_buffer_point_t
+tdl_buffer_point (u8char_t uchar, tdl_style_t style)
 {
-  tdl_line_t line;
+  tdl_buffer_point_t bpt;
 
-  line.a = point_a;
-  line.b = point_b;
+  memset (&bpt, 0, sizeof (tdl_buffer_point_t));
+  
+  bpt.style = style;
 
-  return line;
+  if (uchar != NULL)
+    u8char_copy (bpt.character, uchar);
+
+  return bpt;
 }
 
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
+int
+tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
 {
-  tdl_rectangle_t rect;
+  if (dest == NULL || src == NULL)
+    return EXIT_FAILURE;
 
-  rect.point = point;
-  rect.size = size;
+  u8char_copy (dest->character, src->character);
+  dest->style = src->style;
 
-  return rect;
-}
-
-tdl_point_t
-tdl_point (int x, int y)
-{
-  tdl_point_t point;
-
-  point.x = x;
-  point.y = y;
-
-  return point;
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  tdl_size_t size;
-
-  size.height = height;
-  size.width = width;
-
-  return size;
+  return EXIT_SUCCESS;
 }
