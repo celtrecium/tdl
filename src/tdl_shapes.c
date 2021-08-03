@@ -106,11 +106,58 @@ tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text, tdl_rectangle_t rect)
   return EXIT_SUCCESS;
 }
 
-int tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
-                               tdl_rectangle_t rect);
+int
+tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
+                           tdl_rectangle_t rect)
+{
+  size_t i = 0;
+  size_t j = 0;
+  
+  if (canv == NULL)
+    return EXIT_FAILURE;
+
+  for (i = 0; i < rect.size.width; ++i)
+    {
+      for (j = 0; j < rect.size.height; ++j)
+        {
+          tdl_set_cursor_pos (
+              canv, tdl_point ((int)i + rect.point.x, (int)j + rect.point.y));
+
+          tdl_print (canv, text);
+        }
+    }
+
+  return EXIT_SUCCESS;
+}
 
 /* 1.2. Functions for drawing an array of shapes */
-int tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
-                         tdl_rectangle_t *rect, size_t n);
-int tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
-                                tdl_rectangle_t *rect, size_t n);
+int
+tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+                     tdl_rectangle_t *rects, size_t n)
+{
+  size_t i = 0;
+  
+  if (canv == NULL)
+    return EXIT_FAILURE;
+
+  for (i = 0; i < n; ++i)
+    tdl_draw_rectangle (canv, text, rects[i]);
+
+  return EXIT_SUCCESS;
+}
+
+int
+tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+                            tdl_rectangle_t *rects, size_t n)
+{
+  size_t i = 0;
+  
+  if (canv == NULL)
+    return EXIT_FAILURE;
+
+  for (i = 0; i < n; ++i)
+    tdl_draw_filled_rectangle (canv, text, rects[i]);
+
+  return EXIT_SUCCESS;
+}
+

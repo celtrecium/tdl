@@ -1,3 +1,4 @@
+
 /*
  * This file is part of Text Drawing Library.
  *
@@ -102,6 +103,7 @@ typedef struct tdl_canvas
   tdl_size_t size;
   tdl_error_t err;
   sbvector_t buffer;
+  sbvector_t _sbuffer;
   sbvector_t diff;
 } tdl_canvas_t;
 

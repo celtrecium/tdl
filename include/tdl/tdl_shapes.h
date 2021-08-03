@@ -33,8 +33,8 @@ int tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
 int tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
                     size_t n);
 int tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
-                         tdl_rectangle_t *rect, size_t n);
+                         tdl_rectangle_t *rects, size_t n);
 int tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
-                                tdl_rectangle_t *rect, size_t n);
+                                tdl_rectangle_t *rects, size_t n);
 
 #endif /* TDL_SHAPES_H */
