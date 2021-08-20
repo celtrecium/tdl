@@ -16,7 +16,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include "tdl/tdl_display.h"
+#include "tdl/tdl_objects.h"
 #include "tdl/tdl_style.h"
+#include "tdl/tdl_buffer.h"
+#include <sbvector.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,7 +31,6 @@ typedef struct tdl_display_signal
 } _tdl_display_signal_t;
 
 static const tdl_attributes_t _attrib_num[] = {
-  TDL_NO_ATTRIBUTES,
   TDL_BOLD,
   TDL_ITALIC,
   TDL_UNDERLINE,
@@ -37,12 +39,11 @@ static const tdl_attributes_t _attrib_num[] = {
 };
 
 static const char *_attrib_str[] = {
-  ";0", /* No attributes */
-  ";1", /* Bold */
-  ";3", /* Italic */
-  ";4", /* Underline */
-  ";9", /* Crossed out */
-  ";2"  /* Dim */
+  ";1\0", /* Bold */
+  ";3\0", /* Italic */
+  ";4\0", /* Underline */
+  ";9\0", /* Crossed out */
+  ";2\0"  /* Dim */
 };
 
 static inline _tdl_display_signal_t
@@ -81,7 +82,7 @@ _tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
 
   fputs ("\033[", stdout);
   
-  for (i = 1; i < sizeof (_attrib_num); ++i)
+  for (i = 0; i < sizeof (_attrib_num); ++i)
     {
       if ((attrib & _attrib_num[i]) == _attrib_num[i])
         fputs (_attrib_str[i], stdout);
@@ -90,7 +91,7 @@ _tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
   putchar ('m');
 }
 
-static int
+static bool
 _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
 {
   size_t i = 0;
@@ -99,8 +100,8 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
   
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
-      if ((curr = &sbv_get (line, tdl_buffer_point_t, i)) == NULL)
-        return EXIT_FAILURE;
+      if ((curr = sbv_get (line, tdl_buffer_point_t, i)) == NULL)
+        return false;
 
       dispsig = _tdl_display_state (curr, prev);
 
@@ -118,10 +119,10 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
       prev = curr;
     }
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int
+bool
 tdl_display (tdl_canvas_t *canv)
 {
   size_t i;
@@ -129,19 +130,22 @@ tdl_display (tdl_canvas_t *canv)
   
   for (i = 0; i < canv->diff.length; ++i)
     {
-      ldiffptr = &sbv_get (&canv->diff, tdl_ldiff_t, i);
+      ldiffptr = sbv_get (&canv->diff, tdl_ldiff_t, i);
 
       printf ("\033[%zu;%zuH", ldiffptr->line_number,
               ldiffptr->first_modified);
 
       _tdl_print_line (
-          &sbv_get (&canv->buffer, sbvector_t, ldiffptr->line_number),
+          sbv_get (&canv->buffer.fbuff, sbvector_t, ldiffptr->line_number),
           ldiffptr);
 
       putchar ('\n');
     }
 
   puts ("\033[0m");
+
+  tdl_buffer_fbuff_to_sbuff (&canv->buffer);
+  sbv_clear (&canv->diff);
   
-  return EXIT_SUCCESS;
+  return true;
 }

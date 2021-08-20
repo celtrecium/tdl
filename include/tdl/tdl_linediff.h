@@ -22,6 +22,6 @@
 #include "tdl_objects.h"
 
 tdl_ldiff_t tdl_ldiff (size_t line, size_t first_m, size_t last_m);
-int tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified);
+bool tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified);
 
 #endif  /* TDL_LINEDIFF_H */

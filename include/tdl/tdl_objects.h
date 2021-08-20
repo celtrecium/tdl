@@ -1,4 +1,3 @@
-
 /*
  * This file is part of Text Drawing Library.
  *
@@ -91,20 +90,32 @@ typedef struct tdl_ldiff
   size_t last_modified;
 } tdl_ldiff_t;
 
-typedef struct tdl_text_t
+typedef struct tdl_text
 {
   u8string_t *string;
   tdl_style_t style;
 } tdl_text_t;
 
+typedef struct tdl_buffer
+{
+  sbvector_t fbuff; /* First buffer */
+  sbvector_t sbuff; /* Second buffer */
+  tdl_size_t size;
+} tdl_buffer_t;
+
+typedef struct tdl_buffer_line
+{
+  sbvector_t line;
+  bool _is_empty;
+} tdl_buffer_line_t;
+
 typedef struct tdl_canvas
 {
   tdl_point_t cursor;
   tdl_size_t size;
-  tdl_error_t err;
-  sbvector_t buffer;
-  sbvector_t _sbuffer;
+  tdl_buffer_t buffer;
   sbvector_t diff;
+  tdl_error_t err;
 } tdl_canvas_t;
 
 #endif /* TDL_H */

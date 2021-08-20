@@ -23,6 +23,6 @@
 #include "tdl_objects.h"
 
 tdl_buffer_point_t tdl_buffer_point (u8char_t uchar, tdl_style_t style);
-int tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src);
+bool tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src);
 
 #endif /* TDL_BUFFERPOINT_H */

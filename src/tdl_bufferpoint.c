@@ -35,7 +35,7 @@ tdl_buffer_point (u8char_t uchar, tdl_style_t style)
   return bpt;
 }
 
-int
+bool
 tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
 {
   if (dest == NULL || src == NULL)
@@ -44,5 +44,5 @@ tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
   u8char_copy (dest->character, src->character);
   dest->style = src->style;
 
-  return EXIT_SUCCESS;
+  return true;
 }

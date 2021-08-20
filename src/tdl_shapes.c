@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 /* 1.1. Functions for drawing shapes */
-int
+bool
 tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
 {
   const int deltaX = abs(line.b.x - line.a.x);
@@ -38,7 +38,7 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
   tdl_point_t tmp_cur;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
   
   tmp_cur = canv->cursor;
   
@@ -64,25 +64,25 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
 
   tdl_set_cursor_pos (canv, tmp_cur);
   
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int
+bool
 tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
                 size_t n)
 {
   size_t i = 0;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   for (i = 0; i < n; ++i)
     tdl_draw_line (canv, text, lines[i]);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int
+bool
 tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text, tdl_rectangle_t rect)
 {
   tdl_line_t lines[4] = {
@@ -99,14 +99,14 @@ tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text, tdl_rectangle_t rect)
   };
 
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   tdl_draw_lines (canv, text, lines, 4);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int
+bool
 tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
                            tdl_rectangle_t rect)
 {
@@ -114,7 +114,7 @@ tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
   size_t j = 0;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   for (i = 0; i < rect.size.width; ++i)
     {
@@ -127,37 +127,36 @@ tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
         }
     }
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
 /* 1.2. Functions for drawing an array of shapes */
-int
+bool
 tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
                      tdl_rectangle_t *rects, size_t n)
 {
   size_t i = 0;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   for (i = 0; i < n; ++i)
     tdl_draw_rectangle (canv, text, rects[i]);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int
+bool
 tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
                             tdl_rectangle_t *rects, size_t n)
 {
   size_t i = 0;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   for (i = 0; i < n; ++i)
     tdl_draw_filled_rectangle (canv, text, rects[i]);
 
-  return EXIT_SUCCESS;
+  return true;
 }
-

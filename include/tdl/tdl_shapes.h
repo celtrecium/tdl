@@ -23,18 +23,18 @@
 #include "tdl_objects.h"
 
 /* 1.1. Functions for drawing shapes */
-int tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line);
-int tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text,
+bool tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line);
+bool tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text,
                         tdl_rectangle_t rect);
-int tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
+bool tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
                                tdl_rectangle_t rect);
 
 /* 1.2. Functions for drawing an array of shapes */
-int tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
+bool tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
                     size_t n);
-int tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+bool tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
                          tdl_rectangle_t *rects, size_t n);
-int tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+bool tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
                                 tdl_rectangle_t *rects, size_t n);
 
 #endif /* TDL_SHAPES_H */

@@ -1,3 +1,4 @@
+
 /*
  * This file is part of Text Drawing Library.
  *
@@ -16,25 +17,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_text.h"
-#include <string.h>
 
-tdl_text_t
-tdl_text (u8string_t *string, tdl_style_t style)
-{
-  tdl_text_t text;
+#ifndef TDL_BUFFER_H
+#define TDL_BUFFER_H
 
-  text.string = string;
-  text.style = style;
+#include "tdl_objects.h"
 
-  return text;
-}
+#define _TDL_DEFAULT_BLOCKSZ 20
 
-bool
-tdl_text_free (tdl_text_t text)
-{
-  u8string_free (text.string);
-  memset (&text.style, 0, sizeof (tdl_style_t));
-  
-  return true;
-}
+tdl_buffer_t tdl_buffer (tdl_size_t size);
+bool tdl_buffer_free (tdl_buffer_t *buff);
+bool tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize);
+tdl_buffer_point_t *tdl_buffer_get_point (tdl_buffer_t *buff,
+                                          tdl_point_t point);
+bool tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff);
+
+
+#endif  /* TDL_BUFFER_H */

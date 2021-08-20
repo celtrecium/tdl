@@ -20,7 +20,8 @@
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_linediff.h"
-#include "tdl/tdl_style.h"
+#include "tdl/tdl_objects.h"
+#include "tdl/tdl_buffer.h"
 #include <sbvector.h>
 #include <stdbool.h>
 
@@ -30,8 +31,6 @@
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #  include <windows.h>
 #endif
-
-#define _TDL_DEFAULT_BLOCKSZ 20
 
 /* Crossplatform function for getting the terminal size */
 static tdl_size_t
@@ -76,98 +75,72 @@ _tdl_set_diff (sbvector_t *sbv, tdl_point_t modpt)
 
   for (i = 0; i < sbv->length; ++i)
     {
-      if ((ldiff = &sbv_get (sbv, tdl_ldiff_t, i))->line_number
+      if ((ldiff = sbv_get (sbv, tdl_ldiff_t, i))->line_number
           == (size_t)modpt.y)
         {
-          tdl_ldiff_set (ldiff, (size_t) modpt.x);
+          tdl_ldiff_set (ldiff, (size_t)modpt.x);
           
           return;
         }
     }
 
   sbv_push (sbv, tdl_ldiff_t,
-            tdl_ldiff ((size_t)modpt.y,
-                       (size_t)modpt.x,
-                       (size_t)modpt.x));
+            tdl_ldiff ((size_t)modpt.y, (size_t)modpt.x, (size_t)modpt.x));
 }
 
 tdl_canvas_t *
-tdl_create_canvas (void)
+tdl_canvas (void)
 {
   tdl_canvas_t *canv = calloc (1, sizeof (tdl_canvas_t));
-  size_t i = 0;
-  size_t j = 0;
   
   canv->err = TDL_OK;
   
   canv->cursor = tdl_point (0, 0);
   canv->size = _tdl_get_term_size ();
-  canv->buffer = sbvector (canv->size.height, sizeof (sbvector_t),
-                           _TDL_DEFAULT_BLOCKSZ, true);
+  canv->diff = sbvector (sizeof (tdl_ldiff_t));
 
-  for (i = 0; i < canv->size.height; ++i)
-    {
-      sbv_push (&canv->buffer, sbvector_t,
-                sbvector (canv->size.width, sizeof (tdl_buffer_point_t),
-                          _TDL_DEFAULT_BLOCKSZ, true));
+  canv->buffer = tdl_buffer (canv->size);
 
-      for (j = 0; j < canv->size.width; ++j)
-        {
-          sbv_push (&sbv_get (&canv->buffer, sbvector_t, i),
-                    tdl_buffer_point_t,
-                    tdl_buffer_point (
-                        " ", tdl_style (tdl_point_color (256, 256),
-                                        tdl_attributes (TDL_NO_ATTRIBUTES))));
-        }
-    }
-
-  canv->diff = sbvector (canv->size.height, sizeof (tdl_ldiff_t),
-                         _TDL_DEFAULT_BLOCKSZ, true);
-  
   return canv;
 }
 
-int
+bool
 tdl_destroy_canvas (tdl_canvas_t *canv)
-{
-  size_t i;
-  
+{  
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   canv->err = TDL_OK;
 
   sbv_free (&canv->diff);
-
-  for (i = 0; i < canv->buffer.length; ++i)
-    sbv_free (&sbv_get(&canv->buffer, sbvector_t, i));
-
-  sbv_free (&canv->buffer);
+  tdl_buffer_free (&canv->buffer);
 
   free (canv);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
 /* 2. Canvas setters */
-int tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
+bool
+tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
 {
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   canv->cursor = _tdl_get_point_in_buffer (canv, pos);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
-int tdl_print (tdl_canvas_t *canv, tdl_text_t text)
+bool
+tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
   tdl_buffer_point_t *buffpt = NULL;
   tdl_point_t cur;
   
   if (canv == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   for (i = 0; i < text.string->length; ++i)
     {
@@ -182,25 +155,13 @@ int tdl_print (tdl_canvas_t *canv, tdl_text_t text)
       
       tdl_set_cursor_pos (canv, cur);
       
-      buffpt = &sbv_get (&sbv_get (&canv->buffer, sbvector_t, canv->cursor.y),
-                         tdl_buffer_point_t, canv->cursor.x);
-      
+      buffpt = tdl_buffer_get_point (&canv->buffer, canv->cursor);
+
       u8char_copy (buffpt->character, text.string->string[i]);
       buffpt->style = text.style;
 
       _tdl_set_diff (&canv->diff, canv->cursor);
     }
   
-  return EXIT_SUCCESS;
+  return true;
 }
-
-/* 3.1. Functions for drawing shapes */
-int tdl_draw_line (tdl_canvas_t *canv, tdl_line_t line);
-int tdl_draw_rectangle (tdl_canvas_t *canv, tdl_rectangle_t rect);
-int tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_rectangle_t rect);
-
-/* 3.2. Functions for drawing an array of shapes */
-int tdl_draw_lines (tdl_canvas_t *canv, tdl_line_t *lines, size_t n);
-int tdl_draw_rectangles (tdl_canvas_t *canv, tdl_rectangle_t *rect, size_t n);
-int tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_rectangle_t *rect,
-                                size_t n);

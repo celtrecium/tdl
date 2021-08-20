@@ -32,16 +32,16 @@ tdl_ldiff (size_t line, size_t first_m, size_t last_m)
   return ldiff;
 }
 
-int
+bool
 tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified)
 {
   if (ldiff == NULL)
-    return EXIT_FAILURE;
+    return false;
 
   if (modified > ldiff->last_modified)
     ldiff->last_modified = modified;
   else if (modified < ldiff->first_modified)
     ldiff->first_modified = modified;
 
-  return EXIT_SUCCESS;
+  return true;
 }

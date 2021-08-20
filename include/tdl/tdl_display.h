@@ -23,6 +23,6 @@
 #include "tdl_objects.h"
 
 /* Display function */
-int tdl_display (tdl_canvas_t *canv);
+bool tdl_display (tdl_canvas_t *canv);
 
 #endif /* TDL_DISPLAY_H */
