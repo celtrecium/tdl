@@ -21,7 +21,7 @@
 
 #include "tdl_objects.h"
 
-#define _LAST_STYLES_ARG 17
+#define LAST_STYLES_ARG 17
 
 #define TDL_BLACK 0
 #define TDL_RED 1
@@ -46,6 +46,6 @@ tdl_style_t tdl_style (tdl_point_color_t color, tdl_attributes_t attrs);
 bool tdl_style_compare (tdl_style_t *first, tdl_style_t *second);
 
 #define tdl_attributes(...) \
-  __tdl_attributes_intern (__VA_ARGS__, _LAST_STYLES_ARG)
+  __tdl_attributes_intern (__VA_ARGS__, LAST_STYLES_ARG)
 
 #endif  /* TDL_STYLE_H */

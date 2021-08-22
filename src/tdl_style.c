@@ -41,7 +41,7 @@ __tdl_attributes_intern (tdl_attributes_t attrs, ...)
 
   va_start (lst, attrs);
   
-  while (attr != _LAST_STYLES_ARG)
+  while (attr != LAST_STYLES_ARG)
     {
       retattrs |= attr;
       attr = va_arg (lst, tdl_attributes_t);

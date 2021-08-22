@@ -23,8 +23,6 @@
 
 #include "tdl_objects.h"
 
-#define _TDL_DEFAULT_BLOCKSZ 20
-
 tdl_buffer_t tdl_buffer (tdl_size_t size);
 bool tdl_buffer_free (tdl_buffer_t *buff);
 bool tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize);
