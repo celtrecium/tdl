@@ -30,7 +30,7 @@ typedef struct tdl_display_signal
   bool display_attribute;
 } _tdl_display_signal_t;
 
-static const tdl_attributes_t _attrib_num[] = {
+static const tdl_attributes_t _attrib_val[] = {
   TDL_BOLD,
   TDL_ITALIC,
   TDL_UNDERLINE,
@@ -45,6 +45,9 @@ static const char *_attrib_str[] = {
   ";9\0", /* Crossed out */
   ";2\0"  /* Dim */
 };
+
+static const size_t _ATTRIB_NUM
+    = sizeof (_attrib_val) / sizeof (_attrib_val[0]);
 
 static inline _tdl_display_signal_t
 _tdl_display_signal (bool bg, bool fg, bool attrib)
@@ -82,9 +85,9 @@ _tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
 
   fputs ("\033[", stdout);
   
-  for (i = 0; i < sizeof (_attrib_num); ++i)
+  for (i = 0; i < _ATTRIB_NUM; ++i)
     {
-      if ((attrib & _attrib_num[i]) == _attrib_num[i])
+      if ((attrib & _attrib_val[i]) == _attrib_val[i])
         fputs (_attrib_str[i], stdout);
     }
 

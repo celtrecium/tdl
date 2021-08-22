@@ -136,7 +136,6 @@ bool
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
-  tdl_buffer_point_t *buffpt = NULL;
   tdl_point_t cur;
   
   if (canv == NULL)
@@ -154,11 +153,10 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
         cur.x += 8;
       
       tdl_set_cursor_pos (canv, cur);
-      
-      buffpt = tdl_buffer_get_point (&canv->buffer, canv->cursor);
 
-      u8char_copy (buffpt->character, text.string->string[i]);
-      buffpt->style = text.style;
+      tdl_buffer_set_point (
+          &canv->buffer, canv->cursor,
+          tdl_buffer_point (text.string->string[i], text.style));
 
       _tdl_set_diff (&canv->diff, canv->cursor);
     }

@@ -24,6 +24,7 @@
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_geometry.h"
 #include <sbvector.h>
+#include <u8string.h>
 
 static sbvector_t
 _tdl_buff_allocate (tdl_size_t size)
@@ -204,6 +205,23 @@ tdl_buffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
   return tdl_buffer_line_get (
       sbv_get (&buff->fbuff, tdl_buffer_line_t, (size_t)point.y),
       (size_t)point.x);
+}
+
+bool
+tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
+                      tdl_buffer_point_t bpt)
+{
+  tdl_buffer_line_t *bl;
+  
+  if (!buff)
+    return false;
+
+  bl = sbv_get (&buff->fbuff, tdl_buffer_line_t, (size_t)point.y);
+
+  bl->_is_empty = false;
+  *tdl_buffer_line_get (bl, (size_t)point.x) = bpt;
+  
+  return true;
 }
 
 bool
