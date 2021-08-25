@@ -24,6 +24,7 @@
 #include "tdl/tdl_buffer.h"
 #include <sbvector.h>
 #include <stdbool.h>
+#include "tdl/tdl_style.h"
 
 #if defined(__unix__)
 #  include <termios.h>
@@ -150,7 +151,7 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
       if (u8char_compare(text.string->string[i], "\n") == true)
         ++cur.y;
       else if (u8char_compare(text.string->string[i], "\t") == true)
-        cur.x += 8;
+        cur.x += 8;             /* Tab character size */
       
       tdl_set_cursor_pos (canv, cur);
 
@@ -159,6 +160,34 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
           tdl_buffer_point (text.string->string[i], text.style));
 
       _tdl_set_diff (&canv->diff, canv->cursor);
+    }
+  
+  return true;
+}
+
+bool
+tdl_clear (tdl_canvas_t *canv)
+{
+  size_t i;
+  tdl_buffer_point_t bpt;
+  tdl_buffer_line_t *bl;
+  
+  if (!canv)
+    return false;
+
+  bpt = tdl_buffer_point (
+      " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
+
+  for (i = 0; i < canv->size.height; ++i)
+    {
+      bl = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, i);
+      
+      if (!bl->_is_empty)
+        {
+          sbv_fill (&bl->line, &bpt, bl->line.length);
+          
+          bl->_is_empty = true;
+        }
     }
   
   return true;

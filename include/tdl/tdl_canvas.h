@@ -32,4 +32,6 @@ bool tdl_destroy_canvas (tdl_canvas_t *canv);
 bool tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
 bool tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 
+bool tdl_clear (tdl_canvas_t *canv);
+
 #endif /* TDL_CANVAS_H */

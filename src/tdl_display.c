@@ -16,6 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include "tdl/tdl_display.h"
+#include "tdl/tdl_linediff.h"
 #include "tdl/tdl_objects.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_buffer.h"
@@ -103,18 +104,20 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
   
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
-      if ((curr = sbv_get (line, tdl_buffer_point_t, i)) == NULL)
+      curr = sbv_get (line, tdl_buffer_point_t, i);
+      
+      if (!curr)
         return false;
 
       dispsig = _tdl_display_state (curr, prev);
 
-      if (dispsig.display_attribute == true)
+      if (dispsig.display_attribute)
         _tdl_print_attributes (curr, prev);
 
-      if (dispsig.display_color_bg == true)
+      if (dispsig.display_color_bg)
         printf ("\033[48;5;%um", curr->style.color.bg);
 
-      if (dispsig.display_color_fg == true)
+      if (dispsig.display_color_fg)
         printf ("\033[38;5;%um", curr->style.color.fg);
 
       fputs (curr->character, stdout);
@@ -134,7 +137,16 @@ tdl_display (tdl_canvas_t *canv)
   for (i = 0; i < canv->diff.length; ++i)
     {
       ldiffptr = sbv_get (&canv->diff, tdl_ldiff_t, i);
+      tdl_ldiff_clarify_line_edges (ldiffptr, &canv->buffer);
 
+      if (sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t,
+                   ldiffptr->line_number)->_is_empty)
+        {
+          printf ("\033[%zu;H\033[K", ldiffptr->line_number);
+
+          continue;
+        }
+      
       printf ("\033[%zu;%zuH", ldiffptr->line_number,
               ldiffptr->first_modified);
 
