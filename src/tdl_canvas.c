@@ -171,21 +171,28 @@ tdl_clear (tdl_canvas_t *canv)
   size_t i;
   tdl_buffer_point_t bpt;
   tdl_buffer_line_t *bl;
+  tdl_line_t buff_diff_line;
   
   if (!canv)
     return false;
-
+  
   bpt = tdl_buffer_point (
       " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
+  buff_diff_line
+      = tdl_line (tdl_point (0, 0), tdl_point ((int)canv->size.width, 0));
 
   for (i = 0; i < canv->size.height; ++i)
     {
       bl = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, i);
+      ++buff_diff_line.a.y, ++buff_diff_line.b.y;
       
       if (!bl->_is_empty)
         {
           sbv_fill (&bl->line, &bpt, bl->line.length);
           
+          _tdl_set_diff (&canv->diff, buff_diff_line.a);
+          _tdl_set_diff (&canv->diff, buff_diff_line.b);
+
           bl->_is_empty = true;
         }
     }
