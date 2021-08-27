@@ -21,6 +21,7 @@
 #include "tdl/tdl_buffer.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferline.h"
+#include "tdl/tdl_bufferpoint.h"
 #include <sbvector.h>
 #include <stdlib.h>
 
@@ -35,13 +36,13 @@ _tdl_internal_buffer_get_point (sbvector_t *buff, tdl_point_t point)
   static inline size_t _tdl_clarify_##modified##_modified_point (             \
       tdl_ldiff_t *ldiff, tdl_buffer_t *buff)                                 \
   {                                                                           \
-    tdl_point_t point                                                         \
-      = tdl_point ((int)beg_value, (int)ldiff->line_number);                  \
+    tdl_point_t point = tdl_point ((int)beg_value, (int)ldiff->line_number);  \
                                                                               \
     for (; expr; operation)                                                   \
       {                                                                       \
-        if (_tdl_internal_buffer_get_point (&buff->fbuff, point)              \
-            != _tdl_internal_buffer_get_point (&buff->sbuff, point))          \
+        if (!tdl_buffpt_compare (                                             \
+                _tdl_internal_buffer_get_point (&buff->fbuff, point),         \
+                _tdl_internal_buffer_get_point (&buff->sbuff, point)))        \
           return (size_t)point.x;                                             \
       }                                                                       \
     return (size_t)point.x;                                                   \
@@ -67,7 +68,7 @@ tdl_ldiff (size_t line, size_t first_m, size_t last_m)
 bool
 tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified)
 {
-  if (ldiff == NULL)
+  if (!ldiff)
     return false;
 
   if (modified > ldiff->last_modified)

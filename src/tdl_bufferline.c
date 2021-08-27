@@ -34,9 +34,8 @@ tdl_buffer_line (size_t width)
     {
       sbv_resize (&bl.line, width);
 
-      bpt = tdl_buffer_point (" ",
-                              tdl_style (tdl_point_color (256, 256),
-                                         tdl_attributes (TDL_NO_ATTRIBUTES)));
+      bpt = tdl_buffer_point (
+          " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
 
       sbv_fill (&bl.line, &bpt, bl.line.length);
     }
@@ -67,6 +66,8 @@ tdl_buffer_line_copy (tdl_buffer_line_t *dest, tdl_buffer_line_t *src)
 {
   if (!dest || !src || !sbv_copy (&dest->line, &src->line))
     return false;
+
+  dest->_is_empty = src->_is_empty;
   
   return true;
 }

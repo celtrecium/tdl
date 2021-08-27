@@ -18,7 +18,9 @@
 
 
 #include "tdl/tdl_bufferpoint.h"
+#include "tdl/tdl_style.h"
 #include <string.h>
+#include <u8string.h>
 
 tdl_buffer_point_t
 tdl_buffer_point (u8char_t uchar, tdl_style_t style)
@@ -45,4 +47,17 @@ tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
   dest->style = src->style;
 
   return true;
+}
+
+bool
+tdl_buffpt_compare (tdl_buffer_point_t *first, tdl_buffer_point_t *second)
+{
+  if (!first || !second)
+    return first == second;
+
+  if (u8char_compare (first->character, second->character) &&
+      tdl_style_compare (&first->style, &second->style))
+    return true;
+
+  return false;
 }

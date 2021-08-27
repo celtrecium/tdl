@@ -148,9 +148,9 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
       
       ++cur.x;
 
-      if (u8char_compare(text.string->string[i], "\n") == true)
+      if (u8char_compare(text.string->string[i], "\n"))
         ++cur.y;
-      else if (u8char_compare(text.string->string[i], "\t") == true)
+      else if (u8char_compare(text.string->string[i], "\t"))
         cur.x += 8;             /* Tab character size */
       
       tdl_set_cursor_pos (canv, cur);
@@ -189,7 +189,7 @@ tdl_clear (tdl_canvas_t *canv)
       if (!bl->_is_empty)
         {
           sbv_fill (&bl->line, &bpt, bl->line.length);
-          
+
           _tdl_set_diff (&canv->diff, buff_diff_line.a);
           _tdl_set_diff (&canv->diff, buff_diff_line.b);
 

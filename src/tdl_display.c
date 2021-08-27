@@ -137,16 +137,17 @@ tdl_display (tdl_canvas_t *canv)
   for (i = 0; i < canv->diff.length; ++i)
     {
       ldiffptr = sbv_get (&canv->diff, tdl_ldiff_t, i);
-      tdl_ldiff_clarify_line_edges (ldiffptr, &canv->buffer);
 
       if (sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t,
                    ldiffptr->line_number)->_is_empty)
         {
-          printf ("\033[%zu;H\033[K", ldiffptr->line_number);
+          printf ("\033[%zu;0H\033[m\033[K", ldiffptr->line_number);
 
           continue;
         }
       
+      tdl_ldiff_clarify_line_edges (ldiffptr, &canv->buffer);
+
       printf ("\033[%zu;%zuH", ldiffptr->line_number,
               ldiffptr->first_modified);
 
