@@ -24,6 +24,7 @@
 #include "tdl/tdl_buffer.h"
 #include <sbvector.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "tdl/tdl_style.h"
 
 #if defined(__unix__)
@@ -60,12 +61,8 @@ _tdl_get_term_size (void)
 static inline tdl_point_t
 _tdl_get_point_in_buffer (tdl_canvas_t *canv, tdl_point_t point)
 {
-  tdl_point_t ptret;
-  
-  ptret.x = point.x % (long int)canv->size.width;
-  ptret.y = point.y % (long int)canv->size.height;
-
-  return ptret;
+  return (tdl_point_t){ point.x % (long int)canv->size.width,
+                        point.y % (long int)canv->size.height };
 }
 
 static void
@@ -94,8 +91,6 @@ tdl_canvas (void)
 {
   tdl_canvas_t *canv = calloc (1, sizeof (tdl_canvas_t));
   
-  canv->err = TDL_OK;
-  
   canv->cursor = tdl_point (0, 0);
   canv->size = _tdl_get_term_size ();
   canv->diff = sbvector (sizeof (tdl_ldiff_t));
@@ -108,10 +103,8 @@ tdl_canvas (void)
 bool
 tdl_destroy_canvas (tdl_canvas_t *canv)
 {  
-  if (canv == NULL)
+  if (!canv)
     return false;
-
-  canv->err = TDL_OK;
 
   sbv_free (&canv->diff);
   tdl_buffer_free (&canv->buffer);
@@ -125,13 +118,13 @@ tdl_destroy_canvas (tdl_canvas_t *canv)
 bool
 tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
 {
-  if (canv == NULL)
+  if (!canv)
     return false;
 
   canv->cursor = _tdl_get_point_in_buffer (canv, pos);
 
   return true;
-}
+}    
 
 bool
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
@@ -139,7 +132,7 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
   size_t i;
   tdl_point_t cur;
   
-  if (canv == NULL)
+  if (!canv)
     return false;
 
   for (i = 0; i < text.string->length; ++i)
@@ -159,43 +152,45 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
           &canv->buffer, canv->cursor,
           tdl_buffer_point (text.string->string[i], text.style));
 
-      _tdl_set_diff (&canv->diff, canv->cursor);
+      if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
+          _tdl_set_diff (&canv->diff, canv->cursor);
     }
   
   return true;
+}
+
+static inline void
+_tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
+{
+  tdl_buffer_point_t bpt = { " ", { TDL_NO_ATTRIBUTES, { 256, 256 } } };
+  tdl_buffer_line_t *bl
+      = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, line_num);
+
+  tdl_point_t beg_modpt = (tdl_point_t){ 0, (int)line_num };
+  tdl_point_t end_modpt
+      = (tdl_point_t){ (int)canv->size.width, (int)line_num };
+
+  if (!bl->_is_empty)
+    {
+      sbv_fill (&bl->line, &bpt, bl->line.length);
+
+      _tdl_set_diff (&canv->diff, beg_modpt);
+      _tdl_set_diff (&canv->diff, end_modpt);
+
+      bl->_is_empty = true;
+    }
 }
 
 bool
 tdl_clear (tdl_canvas_t *canv)
 {
   size_t i;
-  tdl_buffer_point_t bpt;
-  tdl_buffer_line_t *bl;
-  tdl_line_t buff_diff_line;
   
   if (!canv)
     return false;
-  
-  bpt = tdl_buffer_point (
-      " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
-  buff_diff_line
-      = tdl_line (tdl_point (0, 0), tdl_point ((int)canv->size.width, 0));
 
   for (i = 0; i < canv->size.height; ++i)
-    {
-      bl = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, i);
-      ++buff_diff_line.a.y, ++buff_diff_line.b.y;
-      
-      if (!bl->_is_empty)
-        {
-          sbv_fill (&bl->line, &bpt, bl->line.length);
+    _tdl_canvas_line_clear (canv, i);
 
-          _tdl_set_diff (&canv->diff, buff_diff_line.a);
-          _tdl_set_diff (&canv->diff, buff_diff_line.b);
-
-          bl->_is_empty = true;
-        }
-    }
-  
   return true;
 }

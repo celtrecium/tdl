@@ -15,6 +15,7 @@
  * along with Text Drawing Library. If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
 #include "tdl/tdl_display.h"
 #include "tdl/tdl_linediff.h"
 #include "tdl/tdl_objects.h"
@@ -23,6 +24,8 @@
 #include <sbvector.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "tdl/tdl_ansi_sequences.h"
+
 
 typedef struct tdl_display_signal
 {
@@ -40,11 +43,11 @@ static const tdl_attributes_t _attrib_val[] = {
 };
 
 static const char *_attrib_str[] = {
-  ";1\0", /* Bold */
-  ";3\0", /* Italic */
-  ";4\0", /* Underline */
-  ";9\0", /* Crossed out */
-  ";2\0"  /* Dim */
+  ";1", /* Bold */
+  ";3", /* Italic */
+  ";4", /* Underline */
+  ";9", /* Crossed out */
+  ";2"  /* Dim */
 };
 
 static const size_t _ATTRIB_NUM
@@ -79,12 +82,12 @@ _tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
   size_t i = 0;
   tdl_attributes_t attrib;
   
-  if (prev == NULL)
+  if (!prev)
     attrib = curr->style.attributes;
   else
     attrib = curr->style.attributes & prev->style.attributes;
 
-  fputs ("\033[", stdout);
+  fputs (ESC, stdout);
   
   for (i = 0; i < _ATTRIB_NUM; ++i)
     {
@@ -92,7 +95,7 @@ _tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
         fputs (_attrib_str[i], stdout);
     }
 
-  putchar ('m');
+  fputs (ATTRIBUTE, stdout);
 }
 
 static bool
@@ -101,7 +104,7 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
   size_t i = 0;
   _tdl_display_signal_t dispsig;
   tdl_buffer_point_t *curr = NULL, *prev = NULL;
-  
+
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
       curr = sbv_get (line, tdl_buffer_point_t, i);
@@ -115,10 +118,10 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
         _tdl_print_attributes (curr, prev);
 
       if (dispsig.display_color_bg)
-        printf ("\033[48;5;%um", curr->style.color.bg);
+        printf (ESC BG_COLOR "%u" ATTRIBUTE, curr->style.color.bg);
 
       if (dispsig.display_color_fg)
-        printf ("\033[38;5;%um", curr->style.color.fg);
+        printf (ESC FG_COLOR "%u" ATTRIBUTE, curr->style.color.fg);
 
       fputs (curr->character, stdout);
 
@@ -133,32 +136,36 @@ tdl_display (tdl_canvas_t *canv)
 {
   size_t i;
   tdl_ldiff_t *ldiffptr;
+  tdl_buffer_line_t *bl;
   
   for (i = 0; i < canv->diff.length; ++i)
     {
       ldiffptr = sbv_get (&canv->diff, tdl_ldiff_t, i);
+      bl       = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t,
+                    ldiffptr->line_number);
 
-      if (sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t,
-                   ldiffptr->line_number)->_is_empty)
+      if (bl->_is_empty)
         {
-          printf ("\033[%zu;0H\033[m\033[K", ldiffptr->line_number);
+          printf (ESC "%zu;0" CURSOR_POS ESC ATTRIBUTE ESC ERASE_LINE,
+                  ldiffptr->line_number + 1);
 
           continue;
         }
       
       tdl_ldiff_clarify_line_edges (ldiffptr, &canv->buffer);
 
-      printf ("\033[%zu;%zuH", ldiffptr->line_number,
-              ldiffptr->first_modified);
+      if (ldiffptr->first_modified > ldiffptr->last_modified)
+         continue;
+      
+      printf (ESC "%zu;%zu" CURSOR_POS, ldiffptr->line_number + 1,
+              ldiffptr->first_modified + 1);
 
-      _tdl_print_line (
-          sbv_get (&canv->buffer.fbuff, sbvector_t, ldiffptr->line_number),
-          ldiffptr);
+      _tdl_print_line (&bl->line, ldiffptr);
 
       putchar ('\n');
     }
 
-  puts ("\033[0m");
+  puts (ESC ATTRIBUTE);
 
   tdl_buffer_fbuff_to_sbuff (&canv->buffer);
   sbv_clear (&canv->diff);

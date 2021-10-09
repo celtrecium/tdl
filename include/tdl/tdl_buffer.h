@@ -31,5 +31,6 @@ tdl_buffer_point_t *tdl_buffer_get_point (tdl_buffer_t *buff,
 bool tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff);
 bool tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
                            tdl_buffer_point_t bpt);
-    
+bool tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point);
+
 #endif  /* TDL_BUFFER_H */

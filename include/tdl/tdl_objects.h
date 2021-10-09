@@ -37,12 +37,6 @@ typedef enum tdl_attributes
   TDL_DIM =           1 << 4
 } tdl_attributes_t;
 
-typedef enum tdl_error
-{
-  TDL_OK,
-  TDL_NULL_PTR_ERR
-} tdl_error_t;
-
 typedef struct tdl_point
 {
   int x;
@@ -115,7 +109,6 @@ typedef struct tdl_canvas
   tdl_size_t size;
   tdl_buffer_t buffer;
   sbvector_t diff;
-  tdl_error_t err;
 } tdl_canvas_t;
 
 #endif /* TDL_H */

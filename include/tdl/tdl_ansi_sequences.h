@@ -16,28 +16,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_geometry.h"
 
-tdl_line_t
-tdl_line (tdl_point_t point_a, tdl_point_t point_b)
-{
-  return (tdl_line_t){ point_a, point_b };
-}
+#ifndef TDL_ANSI_SEQUENCES_H
+#define TDL_ANSI_SEQUENCES_H
 
-tdl_rectangle_t
-tdl_rectangle (tdl_point_t point, tdl_size_t size)
-{
-  return (tdl_rectangle_t){ point, size };
-}
+#define ESC         "\033["
+#define ATTRIBUTE   "m"
+#define ERASE_LINE  "K"
+#define BG_COLOR    "48;5;"
+#define FG_COLOR    "38;5;"
+#define CURSOR_POS  "H"
+#define CURSOR_UP   "A"
+#define CURSOR_DOWN "B"
+#define CURSOR_FWD  "C"
+#define CURSOR_BACK "D"
+#define COLUMN      "G"
 
-tdl_point_t
-tdl_point (int x, int y)
-{
-  return (tdl_point_t){ x, y };
-}
-
-tdl_size_t
-tdl_size (size_t width, size_t height)
-{
-  return (tdl_size_t){ width, height };
-}
+#endif  /* TDL_ANSI_SEQUENCES_H */

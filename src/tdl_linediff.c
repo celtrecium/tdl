@@ -25,34 +25,6 @@
 #include <sbvector.h>
 #include <stdlib.h>
 
-static inline tdl_buffer_point_t *
-_tdl_internal_buffer_get_point (sbvector_t *buff, tdl_point_t point)
-{
-  return tdl_buffer_line_get (
-      sbv_get (buff, tdl_buffer_line_t, (size_t)point.y), (size_t)point.x);
-}
-
-#define tdl_def_clarify_func(modified, beg_value, expr, operation)            \
-  static inline size_t _tdl_clarify_##modified##_modified_point (             \
-      tdl_ldiff_t *ldiff, tdl_buffer_t *buff)                                 \
-  {                                                                           \
-    tdl_point_t point = tdl_point ((int)beg_value, (int)ldiff->line_number);  \
-                                                                              \
-    for (; expr; operation)                                                   \
-      {                                                                       \
-        if (!tdl_buffpt_compare (                                             \
-                _tdl_internal_buffer_get_point (&buff->fbuff, point),         \
-                _tdl_internal_buffer_get_point (&buff->sbuff, point)))        \
-          return (size_t)point.x;                                             \
-      }                                                                       \
-    return (size_t)point.x;                                                   \
-  }
-
-tdl_def_clarify_func (first, ldiff->first_modified,
-                      point.x < (int)ldiff->last_modified, ++point.x)
-tdl_def_clarify_func (last, ldiff->last_modified,
-                      point.x != (int)ldiff->first_modified, --point.x)
-
 tdl_ldiff_t
 tdl_ldiff (size_t line, size_t first_m, size_t last_m)
 {
@@ -79,14 +51,52 @@ tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified)
   return true;
 }
 
+static inline size_t
+_tdl_clarify_first_modified (tdl_ldiff_t *ldiff, tdl_buffer_line_t **buff_lines)
+{
+  size_t i = 0;
+
+  for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
+    {
+      if (!tdl_buffpt_compare(tdl_buffer_line_get (buff_lines[0], i),
+                              tdl_buffer_line_get (buff_lines[1], i)))
+        break;
+    }
+
+  return i;
+}
+
+static inline size_t
+_tdl_clarify_last_modified (tdl_ldiff_t *ldiff, tdl_buffer_line_t **buff_lines)
+{
+  size_t i = 0;
+  size_t last = 0;
+
+  for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
+    {
+      if (!tdl_buffpt_compare(tdl_buffer_line_get (buff_lines[0], i),
+                              tdl_buffer_line_get (buff_lines[1], i)))
+        last = i;
+    }
+
+  return last;
+}
+
 bool
 tdl_ldiff_clarify_line_edges (tdl_ldiff_t *ldiff, tdl_buffer_t *buff)
 {
+  tdl_buffer_line_t *buff_lines[2]
+      = { sbv_get (&buff->fbuff, tdl_buffer_line_t, ldiff->line_number),
+          sbv_get (&buff->sbuff, tdl_buffer_line_t, ldiff->line_number) };
+
   if (!ldiff || !buff)
     return false;
-  
-  ldiff->first_modified = _tdl_clarify_first_modified_point (ldiff, buff);
-  ldiff->last_modified  = _tdl_clarify_last_modified_point (ldiff, buff);
 
+  ldiff->first_modified = _tdl_clarify_first_modified (ldiff, buff_lines);
+  ldiff->last_modified = _tdl_clarify_last_modified (ldiff, buff_lines);
+
+  if (ldiff->first_modified > ldiff->last_modified)
+    buff_lines[0]->_is_empty = true;
+  
   return true;
 }

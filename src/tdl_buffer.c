@@ -207,6 +207,24 @@ tdl_buffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
       (size_t)point.x);
 }
 
+static inline tdl_buffer_point_t *
+_tdl_sbuffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
+{
+  return tdl_buffer_line_get (
+      sbv_get (&buff->sbuff, tdl_buffer_line_t, (size_t)point.y),
+      (size_t)point.x);
+}
+
+bool
+tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point)
+{
+  tdl_buffer_point_t *fpt = tdl_buffer_get_point (buff, point);
+  tdl_buffer_point_t *spt = _tdl_sbuffer_get_point (buff, point);
+  
+  return tdl_style_compare (&fpt->style, &spt->style)
+         & u8char_compare (fpt->character, spt->character);
+}
+
 bool
 tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
                       tdl_buffer_point_t bpt)
@@ -237,6 +255,6 @@ tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff)
       tdl_buffer_line_copy (sbv_get (&buff->sbuff, tdl_buffer_line_t, i),
                             sbv_get (&buff->fbuff, tdl_buffer_line_t, i));
     }
-  
+
   return true;
 }

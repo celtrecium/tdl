@@ -31,7 +31,7 @@ tdl_buffer_point (u8char_t uchar, tdl_style_t style)
   
   bpt.style = style;
 
-  if (uchar != NULL)
+  if (uchar)
     u8char_copy (bpt.character, uchar);
 
   return bpt;
@@ -40,8 +40,8 @@ tdl_buffer_point (u8char_t uchar, tdl_style_t style)
 bool
 tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
 {
-  if (dest == NULL || src == NULL)
-    return EXIT_FAILURE;
+  if (!dest || !src)
+    return false;
 
   u8char_copy (dest->character, src->character);
   dest->style = src->style;
@@ -55,8 +55,7 @@ tdl_buffpt_compare (tdl_buffer_point_t *first, tdl_buffer_point_t *second)
   if (!first || !second)
     return first == second;
 
-  if (u8char_compare (first->character, second->character) &&
-      tdl_style_compare (&first->style, &second->style))
+  if (!memcmp (first, second, sizeof (tdl_buffer_point_t)))
     return true;
 
   return false;
