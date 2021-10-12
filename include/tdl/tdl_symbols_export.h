@@ -1,3 +1,4 @@
+
 /*
  * This file is part of Text Drawing Library.
  *
@@ -16,33 +17,26 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_CANVAS_H
-#define TDL_CANVAS_H
 
-#include <sbvector.h>
-#include "tdl_geometry.h"
-#include "tdl_buffer.h"
-#include "tdl_text.h"
-#include "tdl_symbols_export.h"
+#ifndef TDL_SYMBOLS_EXPORT_H
+#define TDL_SYMBOLS_EXPORT_H
 
-typedef struct tdl_canvas
-{
-  tdl_point_t cursor;
-  tdl_size_t size;
-  tdl_buffer_t buffer;
-  sbvector_t diff;
-} tdl_canvas_t;
+#if defined(_WIN32) || defined(__CYGWIN__)
+# if defined(_MSC_VER)
+#  define TDL_API __declspec(dllexport)
+# elif (defined(__GNUC__) && (__GNUC__ >= 4))
+#  define TDL_API __attribute__((dllexport))
+# else
+#  define TDL_API
+# endif /* _MSC_VER */
+#elif defined(__unix__)
+# if (defined(__GNUC__) && (__GNUC__ >= 4))
+#  define TDL_API __attribute__((visibility("default")))
+# else
+#  define TDL_API
+# endif
+#else
+# define TDL_API
+#endif /* _WIN32 || __CYGWIN__ */
 
-/* This header contains methods for canvas structure */
-
-/* 1. Create/destroy canvas functions */
-TDL_API tdl_canvas_t *tdl_canvas (void);
-TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
-
-/* 2. Canvas setters */
-TDL_API bool tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
-TDL_API bool tdl_print (tdl_canvas_t *canv, tdl_text_t text);
-
-TDL_API bool tdl_clear (tdl_canvas_t *canv);
-
-#endif /* TDL_CANVAS_H */
+#endif  /* TDL_SYMBOLS_EXPORT_H */

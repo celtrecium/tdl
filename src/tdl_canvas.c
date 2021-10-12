@@ -20,7 +20,7 @@
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_linediff.h"
-#include "tdl/tdl_objects.h"
+#include "tdl/tdl_bufferline.h"
 #include "tdl/tdl_buffer.h"
 #include <sbvector.h>
 #include <stdbool.h>
@@ -61,8 +61,8 @@ _tdl_get_term_size (void)
 static inline tdl_point_t
 _tdl_get_point_in_buffer (tdl_canvas_t *canv, tdl_point_t point)
 {
-  return (tdl_point_t){ point.x % (long int)canv->size.width,
-                        point.y % (long int)canv->size.height };
+  return (tdl_point_t){ point.x % (int)canv->size.width,
+                        point.y % (int)canv->size.height };
 }
 
 static void

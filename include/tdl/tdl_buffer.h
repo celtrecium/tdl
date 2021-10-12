@@ -21,7 +21,18 @@
 #ifndef TDL_BUFFER_H
 #define TDL_BUFFER_H
 
-#include "tdl_objects.h"
+#include <stdlib.h>
+#include <sbvector.h>
+#include "tdl_geometry.h"
+#include "tdl_bufferpoint.h"
+#include "tdl_symbols_export.h"
+
+typedef struct tdl_buffer
+{
+  sbvector_t fbuff; /* First buffer */
+  sbvector_t sbuff; /* Second buffer */
+  tdl_size_t size;
+} tdl_buffer_t;
 
 tdl_buffer_t tdl_buffer (tdl_size_t size);
 bool tdl_buffer_free (tdl_buffer_t *buff);
@@ -32,5 +43,8 @@ bool tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff);
 bool tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
                            tdl_buffer_point_t bpt);
 bool tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point);
+
+sbvector_t _tdl_buff_allocate (tdl_size_t size);
+bool _tdl_buff_free (sbvector_t *vec);
 
 #endif  /* TDL_BUFFER_H */

@@ -20,7 +20,15 @@
 #ifndef TDL_BUFFERPOINT_H
 #define TDL_BUFFERPOINT_H
 
-#include "tdl_objects.h"
+#include <u8string.h>
+#include "tdl_style.h"
+#include "tdl_symbols_export.h"
+
+typedef struct tdl_buffer_point
+{
+  u8char_t character;
+  tdl_style_t style;
+} tdl_buffer_point_t;
 
 tdl_buffer_point_t tdl_buffer_point (u8char_t uchar, tdl_style_t style);
 bool tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src);

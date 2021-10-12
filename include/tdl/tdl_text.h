@@ -19,9 +19,22 @@
 #ifndef TDL_TEXT_H
 #define TDL_TEXT_H
 
-#include "tdl_objects.h"
+#include <sbvector.h>
+#include <u8string.h>
+#include "tdl_style.h"
+#include "tdl_symbols_export.h"
 
-tdl_text_t tdl_text (u8string_t *string, tdl_style_t style);
-bool tdl_text_free (tdl_text_t text);
+typedef struct tdl_text
+{
+  u8string_t *string;
+  tdl_style_t style;
+} tdl_text_t;
+
+TDL_API tdl_text_t tdl_text (u8string_t *string, tdl_style_t style);
+TDL_API bool tdl_text_free (tdl_text_t text);
+
+#define tdl_default_text(string)                                              \
+  tdl_text (u8string (string),                                                \
+            tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
 
 #endif  /* TDL_TEXT_H */

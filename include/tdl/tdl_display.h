@@ -20,9 +20,10 @@
 #ifndef TDL_DISPLAY_H
 #define TDL_DISPLAY_H
 
-#include "tdl_objects.h"
+#include "tdl_canvas.h"
+#include "tdl_symbols_export.h"
 
 /* Display function */
-bool tdl_display (tdl_canvas_t *canv);
+TDL_API bool tdl_display (tdl_canvas_t *canv);
 
 #endif /* TDL_DISPLAY_H */

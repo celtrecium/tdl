@@ -26,7 +26,7 @@
 #include <sbvector.h>
 #include <u8string.h>
 
-static sbvector_t
+sbvector_t
 _tdl_buff_allocate (tdl_size_t size)
 {
   size_t i;
@@ -41,7 +41,7 @@ _tdl_buff_allocate (tdl_size_t size)
   return vec;
 }
 
-static inline bool
+bool
 _tdl_buff_free (sbvector_t *vec)
 {
   size_t i;

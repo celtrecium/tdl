@@ -68,12 +68,12 @@ tdl_style (tdl_point_color_t color, tdl_attributes_t attrs)
 bool
 tdl_style_compare (tdl_style_t *first, tdl_style_t *second)
 {
-  if (first == NULL && second == NULL)
+  if (!first && !second)
     return true;
-  else if (first == NULL || second == NULL)
+  else if (!first || !second)
     return false;
 
-  if (memcmp (first, second, sizeof (tdl_style_t)) == 0)
+  if (!memcmp (first, second, sizeof (tdl_style_t)))
     return true;
   else
     return false;

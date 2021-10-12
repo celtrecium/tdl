@@ -19,7 +19,17 @@
 #ifndef TDL_LINEDIFF_H
 #define TDL_LINEDIFF_H
 
-#include "tdl_objects.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include "tdl_buffer.h"
+#include "tdl_symbols_export.h"
+
+typedef struct tdl_ldiff
+{
+  size_t line_number;
+  size_t first_modified;
+  size_t last_modified;
+} tdl_ldiff_t;
 
 tdl_ldiff_t tdl_ldiff (size_t line, size_t first_m, size_t last_m);
 bool tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified);

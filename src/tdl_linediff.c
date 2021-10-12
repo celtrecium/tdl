@@ -96,7 +96,7 @@ tdl_ldiff_clarify_line_edges (tdl_ldiff_t *ldiff, tdl_buffer_t *buff)
   ldiff->last_modified = _tdl_clarify_last_modified (ldiff, buff_lines);
 
   if (ldiff->first_modified > ldiff->last_modified)
-    buff_lines[0]->_is_empty = true;
+    buff_lines[0]->_is_empty = buff_lines[1]->_is_empty = true;
   
   return true;
 }

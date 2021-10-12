@@ -19,11 +19,35 @@
 #ifndef TDL_GEOMETRY_H
 #define TDL_GEOMETRY_H
 
-#include "tdl_objects.h"
+#include <stdlib.h>
+#include "tdl_symbols_export.h"
 
-tdl_line_t tdl_line (tdl_point_t point_a, tdl_point_t point_b);
-tdl_rectangle_t tdl_rectangle (tdl_point_t point, tdl_size_t size);
-tdl_point_t tdl_point (int x, int y);
-tdl_size_t tdl_size (size_t width, size_t height);
+typedef struct tdl_point
+{
+  int x;
+  int y;
+} tdl_point_t;
+
+typedef struct tdl_size
+{
+  size_t width;
+  size_t height;
+} tdl_size_t;
+
+typedef struct tdl_line
+{
+  tdl_point_t a, b;
+} tdl_line_t;
+
+typedef struct tdl_rectangle
+{
+  tdl_point_t point;
+  tdl_size_t size;
+} tdl_rectangle_t;
+
+TDL_API tdl_line_t tdl_line (tdl_point_t point_a, tdl_point_t point_b);
+TDL_API tdl_rectangle_t tdl_rectangle (tdl_point_t point, tdl_size_t size);
+TDL_API tdl_point_t tdl_point (int x, int y);
+TDL_API tdl_size_t tdl_size (size_t width, size_t height);
 
 #endif  /* TDL_GEOMETRY_H */

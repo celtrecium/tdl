@@ -21,6 +21,7 @@
 #include "tdl/tdl_objects.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_buffer.h"
+#include "tdl/tdl_bufferline.h"
 #include <sbvector.h>
 #include <stdio.h>
 #include <stdlib.h>
