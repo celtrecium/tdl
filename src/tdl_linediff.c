@@ -17,7 +17,6 @@
  */
 
 #include "tdl/tdl_linediff.h"
-#include "tdl/tdl_objects.h"
 #include "tdl/tdl_buffer.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferline.h"

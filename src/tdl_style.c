@@ -17,7 +17,6 @@
  */
 
 #include "tdl/tdl_style.h"
-#include "tdl/tdl_objects.h"
 #include <stdarg.h>
 #include <string.h>
 

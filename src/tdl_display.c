@@ -18,7 +18,6 @@
 
 #include "tdl/tdl_display.h"
 #include "tdl/tdl_linediff.h"
-#include "tdl/tdl_objects.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_buffer.h"
 #include "tdl/tdl_bufferline.h"

@@ -21,7 +21,6 @@
 
 #include "tdl/tdl_canvas.h"
 #include "tdl/tdl_geometry.h"
-#include "tdl/tdl_objects.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_text.h"
 #include "tdl/tdl_shapes.h"

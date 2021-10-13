@@ -20,7 +20,6 @@
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_buffer.h"
-#include "tdl/tdl_objects.h"
 #include <sbvector.h>
 #include <stdbool.h>
 
