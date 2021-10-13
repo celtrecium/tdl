@@ -65,10 +65,8 @@ _tdl_display_state (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
 {
   _tdl_display_signal_t ret = _tdl_display_signal (false, false, false);
 
-  if (prev == NULL)
+  if (!prev)
     return _tdl_display_signal (true, true, true);
-  else if (tdl_style_compare (&curr->style, &prev->style))
-    return ret;
 
   ret.display_attribute = curr->style.attributes != prev->style.attributes;
   ret.display_color_bg = curr->style.color.bg != prev->style.color.bg;
@@ -78,15 +76,10 @@ _tdl_display_state (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
 }
 
 static void
-_tdl_print_attributes (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
+_tdl_print_attributes (tdl_buffer_point_t *curr)
 {
   size_t i = 0;
-  tdl_attributes_t attrib;
-  
-  if (!prev)
-    attrib = curr->style.attributes;
-  else
-    attrib = curr->style.attributes & prev->style.attributes;
+  tdl_attributes_t attrib = curr->style.attributes;
 
   fputs (ESC, stdout);
   
@@ -116,7 +109,7 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
       dispsig = _tdl_display_state (curr, prev);
 
       if (dispsig.display_attribute)
-        _tdl_print_attributes (curr, prev);
+        _tdl_print_attributes (curr);
 
       if (dispsig.display_color_bg)
         printf (ESC BG_COLOR "%u" ATTRIBUTE, curr->style.color.bg);
