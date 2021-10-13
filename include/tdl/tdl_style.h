@@ -70,6 +70,8 @@ TDL_API tdl_attributes_t __tdl_attributes_intern (tdl_attributes_t attrs, ...);
 TDL_API tdl_style_t tdl_style (tdl_point_color_t color, tdl_attributes_t attrs);
 TDL_API bool tdl_style_compare (tdl_style_t *first, tdl_style_t *second);
 
+#define tdl_default_style                                                     \
+  tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES)
 #define tdl_attributes(...) \
   __tdl_attributes_intern (__VA_ARGS__, LAST_STYLES_ARG)
 
