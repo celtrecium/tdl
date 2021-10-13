@@ -41,6 +41,7 @@
 #define TDL_BRIGHT_MAGENTA 13
 #define TDL_BRIGHT_CYAN 14
 #define TDL_BRIGHT_WHITE 15
+#define TDL_DEFAULT_COLOR 256
 
 typedef enum tdl_attributes
 {
