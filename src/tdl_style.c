@@ -73,8 +73,7 @@ tdl_style_compare (tdl_style_t *first, tdl_style_t *second)
   else if (!first || !second)
     return false;
 
-  if (!memcmp (first, second, sizeof (tdl_style_t)))
-    return true;
-  else
-    return false;
+  return first->attributes == second->attributes &&
+    first->color.bg == second->color.bg &&
+    first->color.fg == second->color.fg;
 }

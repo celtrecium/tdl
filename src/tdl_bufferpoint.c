@@ -55,8 +55,8 @@ tdl_buffpt_compare (tdl_buffer_point_t *first, tdl_buffer_point_t *second)
   if (!first || !second)
     return first == second;
 
-  if (!memcmp (first, second, sizeof (tdl_buffer_point_t)))
-    return true;
-
-  return false;
+  return u8char_compare(first, second) &&
+    first->style.attributes == second->style.attributes &&
+    first->style.color.bg == second->style.color.bg &&
+    first->style.color.fg == second->style.color.fg;
 }
