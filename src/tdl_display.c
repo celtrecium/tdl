@@ -91,6 +91,24 @@ _tdl_print_attributes (tdl_buffer_point_t *curr)
   fputs (ATTRIBUTE, stdout);
 }
 
+static inline void
+_tdl_print_bg_color (tdl_color_t color)
+{
+  if (color == TDL_DEFAULT_COLOR)
+    fputs (ESC "49" ATTRIBUTE, stdout);
+  else
+    printf (ESC BG_COLOR "%u" ATTRIBUTE, color);
+}
+
+static inline void
+_tdl_print_fg_color (tdl_color_t color)
+{
+  if (color == TDL_DEFAULT_COLOR)
+    fputs (ESC "39" ATTRIBUTE, stdout);
+  else
+    printf (ESC FG_COLOR "%u" ATTRIBUTE, color);
+}
+
 static bool
 _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
 {
@@ -111,10 +129,10 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
         _tdl_print_attributes (curr);
 
       if (dispsig.display_color_bg)
-        printf (ESC BG_COLOR "%u" ATTRIBUTE, curr->style.color.bg);
+        _tdl_print_bg_color (curr->style.color.bg);
 
       if (dispsig.display_color_fg)
-        printf (ESC FG_COLOR "%u" ATTRIBUTE, curr->style.color.fg);
+        _tdl_print_fg_color (curr->style.color.fg);
 
       fputs (curr->character, stdout);
 
