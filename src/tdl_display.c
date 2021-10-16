@@ -158,8 +158,6 @@ tdl_display (tdl_canvas_t *canv)
       putchar ('\n');
     }
 
-  puts (ESC ATTRIBUTE);
-
   tdl_buffer_fbuff_to_sbuff (&canv->buffer);
   sbv_clear (&canv->diff);
   
