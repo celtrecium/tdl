@@ -25,5 +25,6 @@
 #include "tdl/tdl_text.h"
 #include "tdl/tdl_shapes.h"
 #include "tdl/tdl_display.h"
+#include "tdl/tdl_terminal.h"
 
 #endif  /* TDL_H */
