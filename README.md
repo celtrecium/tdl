@@ -15,3 +15,7 @@ In the directory with sources run:
 ## Dependencies
 * [libu8string](https://github.com/celtrecium/libu8string)
 * [libsbvector](https://github.com/celtrecium/libsbvector)
+
+## Related projects
+* [TDLServer](https://gitlab.com/sprytik/tdlserver) — 
+  Interface to the TDL based on the HTTP protocol.
