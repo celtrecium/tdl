@@ -16,25 +16,26 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef TDL_IMAGE_H
+#define TDL_IMAGE_H
 
-#ifndef TDL_BUFFERLINE_H
-#define TDL_BUFFERLINE_H
-
-#include "tdl_bufferpoint.h"
+#include "tdl/tdl_geometry.h"
+#include "tdl/tdl_canvas.h"
 #include <sbvector.h>
-#include "tdl_symbols_export.h"
+#include <stdbool.h>
 
-typedef struct tdl_buffer_line
+typedef struct tdl_image
 {
-  sbvector_t line;
-  bool _is_empty;
-} tdl_buffer_line_t;
+  sbvector_t image;
+  tdl_size_t size;
+} tdl_image_t;
 
-tdl_buffer_line_t tdl_buffer_line (size_t width);
+bool tdl_image_save (const tdl_image_t img, const char *filename);
+tdl_image_t tdl_image_load (const char *filename);
+tdl_image_t tdl_image_crop_from_canvas (tdl_canvas_t *canv,
+                                        tdl_rectangle_t rect);
+bool tdl_image_free (tdl_image_t *img);
+bool tdl_image_print_to_canvas (tdl_canvas_t *canv, tdl_image_t img,
+                                tdl_point_t pos);
 
-tdl_buffer_point_t *tdl_buffer_line_get (tdl_buffer_line_t *line,
-                                         size_t index);
-bool tdl_buffer_line_free (tdl_buffer_line_t *line);
-bool tdl_buffer_line_copy (tdl_buffer_line_t *dest, tdl_buffer_line_t *src);
-
-#endif /* TDL_BUFFERLINE_H */
+#endif /* TDL_IMAGE_H */
