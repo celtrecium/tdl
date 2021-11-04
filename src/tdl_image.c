@@ -123,6 +123,8 @@ tdl_image_save (tdl_image_t img, const char *filename)
 
   _write_image(imgfile, &img);
 
+  fclose (imgfile);
+
   return true;
 }
 
@@ -161,6 +163,8 @@ tdl_image_load (const char *filename)
 
   _initialize_image_buffer (&img);
   _read_image (&img, imgfile);
+
+  fclose (imgfile);
 
   return img;
 }
