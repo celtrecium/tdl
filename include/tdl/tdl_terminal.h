@@ -21,9 +21,10 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "tdl_symbols_export.h"
 
-void tdl_terminal_clear (void);
-void tdl_terminal_set_alternate_screen (bool is_enabled);
-void tdl_terminal_set_cursor (bool is_enabled);
+TDL_API void tdl_terminal_clear (void);
+TDL_API void tdl_terminal_set_alternate_screen (bool is_enabled);
+TDL_API void tdl_terminal_set_cursor (bool is_enabled);
 
 #endif  /* TDL_TERMINAL_H */

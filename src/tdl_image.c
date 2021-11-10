@@ -269,9 +269,9 @@ static inline void
 _set_rectangle_diff (tdl_canvas_t *canv, tdl_rectangle_t rect)
 {
   size_t i = 0;
-  tdl_point_t begin = tdl_point(rect.point.x, rect.point.y);
+  tdl_point_t begin = (tdl_point_t){ rect.point.x, rect.point.y };
   tdl_point_t end
-      = tdl_point (rect.point.x + (int)rect.size.width, rect.point.y);
+      = (tdl_point_t){ rect.point.x + (int)rect.size.width, rect.point.y };
 
   for (i = 0; i < rect.size.height; ++i, ++begin.y, ++end.y)
     _set_line_diff (canv, &begin, &end);

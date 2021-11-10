@@ -30,12 +30,12 @@ typedef struct tdl_image
   tdl_size_t size;
 } tdl_image_t;
 
-bool tdl_image_save (const tdl_image_t img, const char *filename);
-tdl_image_t tdl_image_load (const char *filename);
-tdl_image_t tdl_image_crop_from_canvas (tdl_canvas_t *canv,
-                                        tdl_rectangle_t rect);
-bool tdl_image_free (tdl_image_t *img);
-bool tdl_image_print_to_canvas (tdl_canvas_t *canv, tdl_image_t img,
-                                tdl_point_t pos);
+TDL_API bool tdl_image_save (const tdl_image_t img, const char *filename);
+TDL_API tdl_image_t tdl_image_load (const char *filename);
+TDL_API tdl_image_t tdl_image_crop_from_canvas (tdl_canvas_t *canv,
+                                                tdl_rectangle_t rect);
+TDL_API bool tdl_image_free (tdl_image_t *img);
+TDL_API bool tdl_image_print_to_canvas (tdl_canvas_t *canv, tdl_image_t img,
+                                        tdl_point_t pos);
 
 #endif /* TDL_IMAGE_H */
