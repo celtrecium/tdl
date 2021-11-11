@@ -135,22 +135,22 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
   if (!canv)
     return false;
 
-  for (i = 0; i < text.string->length; ++i)
+  for (i = 0; i < text.string.length; ++i)
     {
       cur = canv->cursor;
       
       ++cur.x;
 
-      if (u8char_compare(text.string->string[i], "\n"))
+      if (u8char_compare(text.string.string[i], "\n"))
         ++cur.y;
-      else if (u8char_compare(text.string->string[i], "\t"))
+      else if (u8char_compare(text.string.string[i], "\t"))
         cur.x += 8;             /* Tab character size */
       
       tdl_set_cursor_pos (canv, cur);
 
       tdl_buffer_set_point (
           &canv->buffer, canv->cursor,
-          tdl_buffer_point (text.string->string[i], text.style));
+          tdl_buffer_point (text.string.string[i], text.style));
 
       if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
           _tdl_set_diff (&canv->diff, canv->cursor);

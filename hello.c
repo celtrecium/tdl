@@ -15,7 +15,7 @@ main (void)
   /* Set the cursor to the position to print text in the middle of the screen
    */
   tdl_set_cursor_pos (
-      canv, tdl_point ((int)(canv->size.width - text.string->length) / 2,
+      canv, tdl_point ((int)(canv->size.width - text.string.length) / 2,
                        (int)canv->size.height / 2));
   tdl_print(canv, text);
 
