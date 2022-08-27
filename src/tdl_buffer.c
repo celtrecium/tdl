@@ -221,7 +221,7 @@ tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point)
   tdl_buffer_point_t *spt = _tdl_sbuffer_get_point (buff, point);
   
   return tdl_style_compare (&fpt->style, &spt->style)
-         & u8char_compare (fpt->character, spt->character);
+         && u8char_compare (fpt->character, spt->character);
 }
 
 bool

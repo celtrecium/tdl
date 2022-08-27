@@ -148,6 +148,9 @@ tdl_display (tdl_canvas_t *canv)
   size_t i;
   tdl_ldiff_t *ldiffptr;
   tdl_buffer_line_t *bl;
+
+  if(canv->diff.length == 0)
+    return true;
   
   for (i = 0; i < canv->diff.length; ++i)
     {
@@ -157,7 +160,7 @@ tdl_display (tdl_canvas_t *canv)
 
       if (bl->_is_empty)
         {
-          printf (ESC "%zu;0" CURSOR_POS ESC ATTRIBUTE ESC ERASE_LINE,
+          printf (ESC "%zu;1" CURSOR_POS ESC ATTRIBUTE ESC ERASE_LINE,
                   ldiffptr->line_number + 1);
 
           continue;
@@ -166,16 +169,17 @@ tdl_display (tdl_canvas_t *canv)
       tdl_ldiff_clarify_line_edges (ldiffptr, &canv->buffer);
 
       if (ldiffptr->first_modified > ldiffptr->last_modified)
-         continue;
+        continue;
       
       printf (ESC "%zu;%zu" CURSOR_POS, ldiffptr->line_number + 1,
               ldiffptr->first_modified + 1);
 
       _tdl_print_line (&bl->line, ldiffptr);
 
-      putchar ('\n');
+      // putchar ('\n');
     }
 
+  fflush(stdout);
   tdl_buffer_fbuff_to_sbuff (&canv->buffer);
   sbv_clear (&canv->diff);
   

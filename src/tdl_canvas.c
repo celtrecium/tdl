@@ -70,7 +70,7 @@ _tdl_set_diff (sbvector_t *sbv, tdl_point_t modpt)
 {
   size_t i = 0;
   tdl_ldiff_t *ldiff;
-
+  
   for (i = 0; i < sbv->length; ++i)
     {
       if ((ldiff = sbv_get (sbv, tdl_ldiff_t, i))->line_number
@@ -124,7 +124,7 @@ tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
   canv->cursor = _tdl_get_point_in_buffer (canv, pos);
 
   return true;
-}    
+}
 
 bool
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
@@ -168,17 +168,13 @@ _tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
 
   tdl_point_t beg_modpt = (tdl_point_t){ 0, (int)line_num };
   tdl_point_t end_modpt
-      = (tdl_point_t){ (int)canv->size.width, (int)line_num };
+    = (tdl_point_t){ (int)canv->size.width, (int)line_num };
+  
+  sbv_fill (&bl->line, &bpt, bl->line.length);
+  _tdl_set_diff (&canv->diff, beg_modpt);
+  _tdl_set_diff (&canv->diff, end_modpt);
 
-  if (!bl->_is_empty)
-    {
-      sbv_fill (&bl->line, &bpt, bl->line.length);
-
-      _tdl_set_diff (&canv->diff, beg_modpt);
-      _tdl_set_diff (&canv->diff, end_modpt);
-
-      bl->_is_empty = true;
-    }
+  bl->_is_empty = true;
 }
 
 bool
