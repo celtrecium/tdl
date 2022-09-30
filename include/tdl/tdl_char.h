@@ -16,16 +16,16 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_H
-#define TDL_H
+#ifndef TDL_LETTER_H
+#define TDL_LETTER_H
 
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_geometry.h"
+#include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_style.h"
-#include "tdl/tdl_text.h"
-#include "tdl/tdl_shapes.h"
-#include "tdl/tdl_display.h"
-#include "tdl/tdl_terminal.h"
-#include "tdl/tdl_char.h"
+#include "tdl/tdl_symbols_export.h"
+#include <u8string.h>
 
-#endif  /* TDL_H */
+typedef tdl_buffer_point_t tdl_char_t;
+
+TDL_API tdl_char_t tdl_char (u8char_t ch, tdl_style_t style);
+
+#endif  /* TDL_LETTER_H */

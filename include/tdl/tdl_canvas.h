@@ -20,6 +20,7 @@
 #define TDL_CANVAS_H
 
 #include <sbvector.h>
+#include "tdl/tdl_char.h"
 #include "tdl_geometry.h"
 #include "tdl_buffer.h"
 #include "tdl_text.h"
@@ -42,6 +43,7 @@ TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 /* 2. Canvas setters */
 TDL_API bool tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
 TDL_API bool tdl_print (tdl_canvas_t *canv, tdl_text_t text);
+TDL_API bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
 
 TDL_API bool tdl_clear (tdl_canvas_t *canv);
 

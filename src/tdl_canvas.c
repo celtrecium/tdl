@@ -17,6 +17,7 @@
  */
 
 #include "tdl/tdl_canvas.h"
+#include "tdl/tdl_char.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_linediff.h"
@@ -126,35 +127,40 @@ tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
   return true;
 }
 
+bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
+{
+  tdl_point_t cur;
+  cur = canv->cursor;
+      
+  ++cur.x;
+
+  if (u8char_compare (ch.character, "\n"))
+    ++cur.y;
+  else if (u8char_compare (ch.character, "\t"))
+    cur.x += 8;             /* Tab character size */
+      
+  tdl_set_cursor_pos (canv, cur);
+
+  tdl_buffer_set_point (
+      &canv->buffer, canv->cursor,
+      tdl_buffer_point (ch.character, ch.style));
+
+  if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
+    _tdl_set_diff (&canv->diff, canv->cursor);
+
+  return true;
+}
+
 bool
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
-  tdl_point_t cur;
   
   if (!canv)
     return false;
 
   for (i = 0; i < text.string.length; ++i)
-    {
-      cur = canv->cursor;
-      
-      ++cur.x;
-
-      if (u8char_compare(text.string.string[i], "\n"))
-        ++cur.y;
-      else if (u8char_compare(text.string.string[i], "\t"))
-        cur.x += 8;             /* Tab character size */
-      
-      tdl_set_cursor_pos (canv, cur);
-
-      tdl_buffer_set_point (
-          &canv->buffer, canv->cursor,
-          tdl_buffer_point (text.string.string[i], text.style));
-
-      if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
-          _tdl_set_diff (&canv->diff, canv->cursor);
-    }
+    tdl_putchar(canv, tdl_char (text.string.string[i], text.style));
   
   return true;
 }

@@ -24,7 +24,7 @@
 
 /* 1.1. Functions for drawing shapes */
 bool
-tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
+tdl_draw_line (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t line)
 {
   const int deltaX = abs(line.b.x - line.a.x);
   const int deltaY = abs(line.b.y - line.a.y);
@@ -45,7 +45,7 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
   while (line.a.x != line.b.x || line.a.y != line.b.y)
     {
       tdl_set_cursor_pos (canv, line.a);
-      tdl_print (canv, text);
+      tdl_putchar (canv, ch);
       
       error2 = error * 2;
 
@@ -68,7 +68,7 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t line)
 }
 
 bool
-tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
+tdl_draw_lines (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t *lines,
                 size_t n)
 {
   size_t i = 0;
@@ -77,13 +77,13 @@ tdl_draw_lines (tdl_canvas_t *canv, tdl_text_t text, tdl_line_t *lines,
     return false;
 
   for (i = 0; i < n; ++i)
-    tdl_draw_line (canv, text, lines[i]);
+    tdl_draw_line (canv, ch, lines[i]);
 
   return true;
 }
 
 bool
-tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text, tdl_rectangle_t rect)
+tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch, tdl_rectangle_t rect)
 {
   tdl_line_t lines[4] = {
     tdl_line (rect.point, tdl_point ((int)rect.size.width + rect.point.x + 1,
@@ -101,13 +101,13 @@ tdl_draw_rectangle (tdl_canvas_t *canv, tdl_text_t text, tdl_rectangle_t rect)
   if (canv == NULL)
     return false;
 
-  tdl_draw_lines (canv, text, lines, 4);
+  tdl_draw_lines (canv, ch, lines, 4);
 
   return true;
 }
 
 bool
-tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
+tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
                            tdl_rectangle_t rect)
 {
   size_t i = 0;
@@ -123,7 +123,7 @@ tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
           tdl_set_cursor_pos (
               canv, tdl_point ((int)i + rect.point.x, (int)j + rect.point.y));
 
-          tdl_print (canv, text);
+          tdl_putchar (canv, ch);
         }
     }
 
@@ -132,7 +132,7 @@ tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_text_t text,
 
 /* 1.2. Functions for drawing an array of shapes */
 bool
-tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+tdl_draw_rectangles (tdl_canvas_t *canv, tdl_char_t ch,
                      tdl_rectangle_t *rects, size_t n)
 {
   size_t i = 0;
@@ -141,13 +141,13 @@ tdl_draw_rectangles (tdl_canvas_t *canv, tdl_text_t text,
     return false;
 
   for (i = 0; i < n; ++i)
-    tdl_draw_rectangle (canv, text, rects[i]);
+    tdl_draw_rectangle (canv, ch, rects[i]);
 
   return true;
 }
 
 bool
-tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
+tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_char_t ch,
                             tdl_rectangle_t *rects, size_t n)
 {
   size_t i = 0;
@@ -156,7 +156,7 @@ tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_text_t text,
     return false;
 
   for (i = 0; i < n; ++i)
-    tdl_draw_filled_rectangle (canv, text, rects[i]);
+    tdl_draw_filled_rectangle (canv, ch, rects[i]);
 
   return true;
 }
