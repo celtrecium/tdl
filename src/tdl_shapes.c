@@ -85,17 +85,16 @@ tdl_draw_lines (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t *lines,
 bool
 tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch, tdl_rectangle_t rect)
 {
+  tdl_point_t end = {
+    rect.point.x + (int)rect.size.width - 1,
+    rect.point.y + (int)rect.size.height - 1
+  };
+
   tdl_line_t lines[4] = {
-    tdl_line (rect.point, tdl_point ((int)rect.size.width + rect.point.x + 1,
-                                     rect.point.y)),
-    tdl_line (rect.point,
-        tdl_point (rect.point.x, rect.point.y + (int)rect.size.height + 1)),
-    tdl_line (tdl_point (rect.point.x + (int)rect.size.width,
-                         rect.point.y + (int)rect.size.height),
-              tdl_point ((int)rect.size.width + rect.point.x, rect.point.y)),
-    tdl_line (tdl_point (rect.point.x + (int)rect.size.width,
-                         rect.point.y + (int)rect.size.height),
-              tdl_point (rect.point.x, rect.point.y + (int)rect.size.height))
+    tdl_line (rect.point, tdl_point (end.x, rect.point.y)),
+    tdl_line (rect.point, tdl_point (rect.point.x, end.y)),
+    tdl_line (tdl_point (end.x, rect.point.y), end),
+    tdl_line (tdl_point (rect.point.x, end.y), end)
   };
 
   if (canv == NULL)

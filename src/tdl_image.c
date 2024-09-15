@@ -134,7 +134,7 @@ _initialize_image_buffer (tdl_image_t *img)
   size_t i = 0;
   sbvector_t *ptr;
 
-  img->image = sbvector (sizeof (sbvector_t));
+  img->image = sbvector (sizeof (tdl_buffer_line_t));
   sbv_resize (&img->image, img->size.height);
 
   for (i = 0; i < img->size.height; ++i)
@@ -182,7 +182,7 @@ static inline void
 _copy_canvas_line (sbslice_t line, tdl_buffer_line_t *imgline)
 {
   size_t i = 0;
-
+  
   for (i = 0; i < line.length; ++i)
     _copy_canvas_point (sbslice_get (&line, tdl_buffer_point_t, i),
                         sbv_get (&imgline->line, tdl_buffer_point_t, i));
