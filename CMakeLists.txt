@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.29)
+include(FetchContent)
 
 project(tdl)
 
@@ -11,13 +12,25 @@ if (WIN32)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_SECURE_NO_DEPRECATE)
 endif()
 
-include_directories(include/)
+FetchContent_Declare(
+    libsbvector
+    GIT_REPOSITORY https://github.com/celtrecium/libsbvector.git
+)
+
+FetchContent_Declare(
+    libu8string
+    GIT_REPOSITORY https://github.com/celtrecium/libu8string.git
+)
+
+FetchContent_MakeAvailable(libsbvector libu8string)
+
+include_directories(include/ ${libsbvector_SOURCE_DIR}/include/ ${libu8string_SOURCE_DIR}/include/)
 
 file(GLOB
     SRCS "src/*.c")
 
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 
-install(TARGETS ${PROJECT_NAME} DESTINATION /usr/lib)
-install(FILES include/tdl.h DESTINATION /usr/include)
-install(DIRECTORY include/tdl DESTINATION /usr/include)
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(FILES include/tdl.h DESTINATION include)
+install(DIRECTORY include/tdl DESTINATION include)
