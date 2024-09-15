@@ -16,17 +16,22 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_H
-#define TDL_H
+#ifndef TDL_VERSION_H
+#define TDL_VERSION_H
 
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_style.h"
-#include "tdl/tdl_text.h"
-#include "tdl/tdl_shapes.h"
-#include "tdl/tdl_display.h"
-#include "tdl/tdl_terminal.h"
-#include "tdl/tdl_char.h"
-#include "tdl/tdl_version.h"
+#include "tdl/tdl_symbols_export.h"
+#include <stdint.h>
 
-#endif  /* TDL_H */
+/*
+ * The byte order in the version number:
+ *   - Empty byte
+ *   - Major version
+ *   - Minor version
+ *   - Patch number
+ */
+
+#define TDL_VERSION 0x00010000
+
+TDL_API int32_t tdl_get_version (void);
+
+#endif /* TDL_VERSION_H */
