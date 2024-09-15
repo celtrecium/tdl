@@ -9,7 +9,8 @@ Currently under development...
 In the directory with sources run:
 1. `mkdir build && cd build`
 2. `cmake ..`
-3. `sudo make install`
+3. `make`
+4. `sudo cmake --install . --prefix /usr`
 
 
 ## Dependencies
