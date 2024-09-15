@@ -31,6 +31,9 @@ file(GLOB
 
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 
+target_link_libraries(${PROJECT_NAME} sbvector
+                                      u8string)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(FILES include/tdl.h DESTINATION include)
 install(DIRECTORY include/tdl DESTINATION include)
