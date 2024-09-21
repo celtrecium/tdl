@@ -36,5 +36,6 @@
 #define ALTERNATE_SCREEN_DISABLE ESC "?1049l"
 #define CURSOR_ENABLE  ESC "?25h"
 #define CURSOR_DISABLE ESC "?25l"
+#define GET_CURSOR_POS ESC "6n"
 
 #endif  /* TDL_ANSI_SEQUENCES_H */
