@@ -30,7 +30,7 @@
  *   - Patch number
  */
 
-#define TDL_VERSION 0x00010000
+#define TDL_VERSION 0x00010101
 
 TDL_API int32_t tdl_get_version (void);
 
