@@ -19,12 +19,13 @@
 #ifndef TDL_TERMINAL_H
 #define TDL_TERMINAL_H
 
-#include <stdlib.h>
 #include <stdbool.h>
+#include "tdl/tdl_geometry.h"
 #include "tdl_symbols_export.h"
 
 TDL_API void tdl_terminal_clear (void);
 TDL_API void tdl_terminal_set_alternate_screen (bool is_enabled);
 TDL_API void tdl_terminal_set_cursor (bool is_enabled);
+TDL_API tdl_point_t tdl_terminal_get_cursor_pos (void);
 
 #endif  /* TDL_TERMINAL_H */
