@@ -27,6 +27,7 @@
 #include <sbvector.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <u8string.h>
 
@@ -270,9 +271,15 @@ _set_rectangle_diff (tdl_canvas_t *canv, tdl_rectangle_t rect)
 {
   size_t i = 0;
   tdl_point_t begin = (tdl_point_t){ rect.point.x, rect.point.y };
-  tdl_point_t end
-      = (tdl_point_t){ rect.point.x + (int)rect.size.width, rect.point.y };
+  tdl_point_t end = (tdl_point_t){ rect.point.x + (int)rect.size.width - 1,
+				   rect.point.y };
 
+  if ((size_t) end.x >= canv->size.width)
+    end.x = (int) canv->size.width - 1;
+
+  if (rect.size.height + (size_t) rect.point.y > canv->size.height)
+    rect.size.height = canv->size.height - (size_t) rect.point.x;
+  
   for (i = 0; i < rect.size.height; ++i, ++begin.y, ++end.y)
     _set_line_diff (canv, &begin, &end);
 }
