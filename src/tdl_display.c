@@ -172,7 +172,7 @@ tdl_display (tdl_canvas_t *canv)
         continue;
       
       printf (ESC "%zu;%zu" CURSOR_POS, ldiffptr->line_number + 1,
-              ldiffptr->first_modified);
+              ldiffptr->first_modified + 1);
 
       _tdl_print_line (&bl->line, ldiffptr);
     }
