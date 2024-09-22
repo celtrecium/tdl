@@ -132,14 +132,21 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   tdl_point_t cur;
   cur = canv->cursor;
       
-  ++cur.x;
-
   if (u8char_compare (ch.character, "\n"))
-    ++cur.y;
+    {
+      ++cur.y;
+      cur.x = 0;
+      tdl_set_cursor_pos (canv, cur);
+
+      return true;
+    }
   else if (u8char_compare (ch.character, "\t"))
-    cur.x += 8;             /* Tab character size */
-      
-  tdl_set_cursor_pos (canv, cur);
+    {
+      cur.x += 8;             /* Tab character size */
+      tdl_set_cursor_pos (canv, cur);
+
+      return true;
+    }
 
   tdl_buffer_set_point (
       &canv->buffer, canv->cursor,
@@ -147,6 +154,9 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
 
   if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
     _tdl_set_diff (&canv->diff, canv->cursor);
+
+  ++cur.x;
+  tdl_set_cursor_pos (canv, cur);
 
   return true;
 }
