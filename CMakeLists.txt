@@ -13,16 +13,11 @@ if (WIN32)
 endif()
 
 FetchContent_Declare(
-    libsbvector
-    GIT_REPOSITORY https://github.com/celtrecium/libsbvector.git
-)
-
-FetchContent_Declare(
     libu8string
     GIT_REPOSITORY https://github.com/celtrecium/libu8string.git
 )
 
-FetchContent_MakeAvailable(libsbvector libu8string)
+FetchContent_MakeAvailable(libu8string)
 
 include_directories(include/ ${libsbvector_SOURCE_DIR}/include/ ${libu8string_SOURCE_DIR}/include/)
 
@@ -31,8 +26,7 @@ file(GLOB
 
 add_library(${PROJECT_NAME} SHARED ${SRCS})
 
-target_link_libraries(${PROJECT_NAME} sbvector
-                                      u8string)
+target_link_libraries(${PROJECT_NAME} u8string)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib64)
 install(FILES include/tdl.h DESTINATION include)
