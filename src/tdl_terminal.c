@@ -22,6 +22,36 @@
 #include <stdio.h>
 #include <termios.h>
 
+#if defined(__unix__)
+#  include <termios.h>
+#  include <sys/ioctl.h>
+#elif defined(_WIN32) || defined(__CYGWIN__)
+#  include <windows.h>
+#endif
+
+tdl_size_t
+tdl_terminal_get_size (void)
+{
+  tdl_size_t termsize;
+
+#if defined(__unix__)
+  struct winsize size;
+
+  ioctl (0, TIOCGWINSZ, (char *)&size);
+
+  termsize.height = size.ws_row;
+  termsize.width = size.ws_col;
+#elif defined(_WIN32) || defined(__CYGWIN__)
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+  GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
+  termsize.width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+  termsize.height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+#endif
+
+  return termsize;
+}
+
 void
 tdl_terminal_clear (void)
 {

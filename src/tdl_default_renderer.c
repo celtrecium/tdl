@@ -41,10 +41,10 @@ static const size_t _ATTRIB_NUM
     = sizeof (_attrib_val) / sizeof (_attrib_val[0]);
 
 static void
-_tdl_print_attributes (tdl_char_t *curr)
+_tdl_print_attributes (tdl_char_t *ch)
 {
   size_t i = 0;
-  tdl_attributes_t attrib = curr->style.attributes;
+  tdl_attributes_t attrib = ch->style.attributes;
 
   fputs (ESC, stdout);
   
@@ -96,22 +96,22 @@ _tdl_prepare_render_new_line (tdl_point_t pos,
 static void
 _tdl_render_char (tdl_point_t point,
 		  tdl_renderer_signals_t ren_signals,
-		  tdl_char_t *ch,
+		  tdl_char_t ch,
 		  void *optional_data)
 {
   (void)optional_data;
   (void)point;
 
   if (ren_signals.set_attribute)
-    _tdl_print_attributes (ch);
+    _tdl_print_attributes (&ch);
 
   if (ren_signals.set_color_bg)
-    _tdl_print_bg_color (ch->style.color.bg);
+    _tdl_print_bg_color (ch.style.color.bg);
 
   if (ren_signals.set_color_fg)
-    _tdl_print_fg_color (ch->style.color.fg);
+    _tdl_print_fg_color (ch.style.color.fg);
 
-  fputs (ch->ch, stdout);
+  fputs (ch.ch, stdout);
 }
 
 tdl_renderer_t tdl_default_renderer =

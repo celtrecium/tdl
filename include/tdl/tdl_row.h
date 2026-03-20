@@ -16,23 +16,22 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_LINEDIFF_H
-#define TDL_LINEDIFF_H
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include "tdl_buffer.h"
-#include "tdl_symbols_export.h"
+#ifndef TDL_ROW_H
+#define TDL_ROW_H
 
-typedef struct tdl_ldiff
-{
-  size_t line_number;
-  size_t first_modified;
-  size_t last_modified;
-} tdl_ldiff_t;
+#include "tdl/tdl_symbols_export.h"
+#include "tdl/tdl_char.h"
 
-tdl_ldiff_t tdl_ldiff (size_t line, size_t first_m, size_t last_m);
-bool tdl_ldiff_set (tdl_ldiff_t *ldiff, size_t modified);
-bool tdl_ldiff_clarify_line_edges (tdl_ldiff_t *ldiff, tdl_buffer_t *buff);
+typedef tdl_char_t* tdl_row_t;
 
-#endif  /* TDL_LINEDIFF_H */
+tdl_row_t tdl_row (size_t width);
+
+size_t tdl_row_size (tdl_row_t bufstr);
+bool tdl_row_resize (tdl_row_t *bufstr, size_t newsize);
+bool tdl_row_set_clear (tdl_row_t bufstr, bool is_clear);
+bool tdl_row_is_clear (tdl_row_t bufstr);
+bool tdl_row_free (tdl_row_t bufstr);
+bool tdl_row_copy (tdl_row_t *dest, tdl_row_t *src);
+
+#endif /* TDL_ROW_H */

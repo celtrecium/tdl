@@ -23,6 +23,7 @@
 #include "tdl/tdl_geometry.h"
 #include "tdl_symbols_export.h"
 
+TDL_API tdl_size_t tdl_terminal_get_size (void);
 TDL_API void tdl_terminal_clear (void);
 TDL_API void tdl_terminal_set_alternate_screen (bool is_enabled);
 TDL_API void tdl_terminal_set_cursor (bool is_enabled);

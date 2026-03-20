@@ -23,7 +23,7 @@ tdl_renderer (void (*render_before_line)(tdl_point_t new_line_pos,
 					 void *optional_data),
 	      void (*render_char)(tdl_point_t pos,
 				  tdl_renderer_signals_t ren_signals,
-				  tdl_char_t *ch,
+				  tdl_char_t ch,
 				  void *optional_data),
 	      void (*render_empty_line)(tdl_point_t pos, void *optional_data),
 	      void *optional_data)

@@ -16,117 +16,56 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_char.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_bufferpoint.h"
-#include "tdl/tdl_linediff.h"
-#include "tdl/tdl_bufferline.h"
+#include <u8string.h>
 #include "tdl/tdl_buffer.h"
-#include <sbvector.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include "tdl/tdl_canvas.h"
 #include "tdl/tdl_style.h"
-#include "u8string.h"
-
-#if defined(__unix__)
-#  include <termios.h>
-#  include <sys/ioctl.h>
-#elif defined(_WIN32) || defined(__CYGWIN__)
-#  include <windows.h>
-#endif
-
-/* Crossplatform function for getting the terminal size */
-static tdl_size_t
-_tdl_get_term_size (void)
-{
-  tdl_size_t termsize;
-
-#if defined(__unix__)
-  struct winsize size;
-
-  ioctl (0, TIOCGWINSZ, (char *)&size);
-
-  termsize.height = size.ws_row;
-  termsize.width = size.ws_col;
-#elif defined(_WIN32) || defined(__CYGWIN__)
-  CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-  GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
-  termsize.width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-  termsize.height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-#endif
-
-  return termsize;
-}
-
-static inline tdl_point_t
-_tdl_get_point_in_buffer (tdl_canvas_t *canv, tdl_point_t point)
-{
-  return (tdl_point_t){ point.x % (int)canv->size.width,
-                        point.y % (int)canv->size.height };
-}
-
-static void
-_tdl_set_diff (sbvector_t *sbv, tdl_point_t modpt)
-{
-  size_t i = 0;
-  tdl_ldiff_t *ldiff;
-  
-  for (i = 0; i < sbv->length; ++i)
-    {
-      if ((ldiff = sbv_get (sbv, tdl_ldiff_t, i))->line_number
-          == (size_t)modpt.y)
-        {
-          tdl_ldiff_set (ldiff, (size_t)modpt.x);
-          
-          return;
-        }
-    }
-
-  sbv_push (sbv, tdl_ldiff_t,
-            tdl_ldiff ((size_t)modpt.y, (size_t)modpt.x, (size_t)modpt.x));
-}
+#include "tdl/tdl_terminal.h"
 
 tdl_canvas_t *
-tdl_canvas_with (tdl_size_t size, bool is_doublebuffered)
+tdl_canvas_with (tdl_size_t size, tdl_buffer_type_t buffer_type)
 {
   tdl_canvas_t *canv = calloc (1, sizeof (tdl_canvas_t));
   
   canv->cursor = tdl_point (0, 0);
   canv->size = size;
+  canv->buffer.type = buffer_type;
 
-  if (is_doublebuffered)
+  switch (buffer_type)
     {
-      canv->diff = sbvector (sizeof (tdl_ldiff_t));
-      canv->buffer = tdl_buffer (canv->size);
+    case TDL_DOUBLE_BUFFER:
+      canv->buffer.as.double_buffer = tdl_dbuffer (size);
+      break;
+    case TDL_SINGLE_BUFFER:
+      canv->buffer.as.single_buffer = tdl_buffer (size);
+      break;
     }
-  else
-    {
-      memset (&canv->diff, 0, sizeof(sbvector_t));
-      canv->buffer = tdl_single_buffer (canv->size);
-    }
-
+  
   return canv;
 }
 
 tdl_canvas_t *
 tdl_canvas (void)
 {
-  return tdl_canvas_with (_tdl_get_term_size(), true);
+  return tdl_canvas_with (tdl_terminal_get_size(), TDL_DOUBLE_BUFFER);
 }
 
 bool
 tdl_destroy_canvas (tdl_canvas_t *canv)
 {  
-  if (!canv)
+  if (canv == NULL)
     return false;
 
-  if (canv->buffer.is_doublebuffered)
-      sbv_free (&canv->diff);
-
-  tdl_buffer_free (&canv->buffer);
-
+  switch (canv->buffer.type)
+    {
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_free (&canv->buffer.as.double_buffer);
+      break;
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_free (canv->buffer.as.single_buffer);
+      break;
+    }
+  
   free (canv);
 
   return true;
@@ -139,9 +78,25 @@ tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
   if (!canv)
     return false;
 
-  canv->cursor = _tdl_get_point_in_buffer (canv, pos);
+  canv->cursor = tdl_point_in_bounds (pos, canv->size);
 
   return true;
+}
+
+inline static void
+_tdl_putchar(tdl_canvas_t *canv, tdl_char_t ch)
+{
+  switch (canv->buffer.type)
+    {
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_set_char (&canv->buffer.as.double_buffer,
+			    canv->cursor,
+			    ch);
+      break;
+    case TDL_SINGLE_BUFFER:
+      canv->buffer.as.single_buffer[canv->cursor.y][canv->cursor.x] = ch;
+      break;
+    }
 }
 
 bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
@@ -154,13 +109,11 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
       ++cur.y;
       tdl_set_cursor_pos (canv, cur);
 
-      // fall through
       return true;
   case '\r':
       cur.x = 0;
       tdl_set_cursor_pos (canv, cur);
 
-      // fall through
       return true;
   case '\t':
       cur.x += 8;             /* Tab character size */
@@ -170,23 +123,14 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   case '\b':
     --cur.x;
     tdl_set_cursor_pos (canv, cur);
-    tdl_buffer_set_char (
-      &canv->buffer, canv->cursor,
-      tdl_char (" ", ch.style));
-
+    _tdl_putchar (canv, tdl_char (" ", ch.style));
+    
     return true;
   case '\a':
     return true;
   }
 
-  tdl_buffer_set_char (
-      &canv->buffer, canv->cursor,
-      tdl_char (ch.ch, ch.style));
-
-  if (canv->buffer.is_doublebuffered
-      && !tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
-    _tdl_set_diff (&canv->diff, canv->cursor);
-
+  _tdl_putchar (canv, ch);
   ++cur.x;
   tdl_set_cursor_pos (canv, cur);
 
@@ -214,47 +158,21 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
   return true;
 }
 
-static inline void
-_tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
-{
-  tdl_char_t tchar = {
-    " ",
-    { TDL_NO_ATTRIBUTES,
-      { 256, 256,
-	{ 0xFF, 0xFF, 0xFF },
-	{ 0xFF, 0xFF, 0xFF }
-      }
-    }
-  };
-
-  tdl_buffer_line_t *bl
-      = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, line_num);
-
-  if (canv->buffer.is_doublebuffered)
-    {
-      tdl_point_t beg_modpt = (tdl_point_t){ 0, (int)line_num };
-      tdl_point_t end_modpt
-	= (tdl_point_t){ (int)canv->size.width, (int)line_num };
-
-      _tdl_set_diff (&canv->diff, beg_modpt);
-      _tdl_set_diff (&canv->diff, end_modpt);
-    }
-
-  sbv_fill (&bl->line, &tchar, bl->line.length);
-
-  bl->_is_empty = true;
-}
-
 bool
 tdl_clear (tdl_canvas_t *canv)
 {
-  size_t i;
-  
-  if (!canv)
+  if (canv == NULL)
     return false;
 
-  for (i = 0; i < canv->size.height; ++i)
-    _tdl_canvas_line_clear (canv, i);
+  switch (canv->buffer.type)
+    {
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_clear (&canv->buffer.as.double_buffer);
+      break;
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_clear (canv->buffer.as.single_buffer);
+      break;
+    }
 
   return true;
 }

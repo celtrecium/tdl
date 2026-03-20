@@ -41,3 +41,22 @@ tdl_size (size_t width, size_t height)
 {
   return (tdl_size_t){ width, height };
 }
+
+tdl_point_t
+tdl_point_in_bounds (tdl_point_t point, tdl_size_t bounds)
+{
+  /* 
+  size_t v1d = ((size_t) point.y * bounds.width + (size_t) point.x)
+    % (bounds.width*bounds.height);
+
+  return (tdl_point_t) {
+    .x = (int) (v1d % bounds.width),
+    .y = (int) (v1d / bounds.height)
+  };
+  */
+  return (tdl_point_t)
+    {
+      .x = point.x % (int) bounds.width,
+      .y = point.y % (int) bounds.height
+    };
+}

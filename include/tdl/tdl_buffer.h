@@ -1,4 +1,3 @@
-
 /*
  * This file is part of Text Drawing Library.
  *
@@ -17,37 +16,20 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TDL_BUFFER_H
 #define TDL_BUFFER_H
 
-#include <stdlib.h>
-#include <sbvector.h>
+#include "tdl/tdl_row.h"
 #include "tdl/tdl_geometry.h"
-#include "tdl/tdl_symbols_export.h"
-#include "tdl/tdl_char.h"
 
-typedef struct tdl_buffer
-{
-  sbvector_t fbuff; /* First buffer */
-  sbvector_t sbuff; /* Second buffer */
-  tdl_size_t size;
-  bool is_doublebuffered;
-} tdl_buffer_t;
+typedef tdl_row_t *tdl_buffer_t;
 
-tdl_buffer_t tdl_buffer(tdl_size_t size);
-tdl_buffer_t tdl_single_buffer(tdl_size_t size);
+tdl_buffer_t tdl_buffer (tdl_size_t size);
+bool tdl_buffer_resize (tdl_buffer_t *buffer, tdl_size_t newsize);
+bool tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src);
+bool tdl_buffer_clear_row (tdl_buffer_t buff, size_t row_n);
+bool tdl_buffer_clear (tdl_buffer_t buff);
+tdl_size_t tdl_buffer_size (tdl_buffer_t *buffer);
+bool tdl_buffer_free (tdl_buffer_t buffer);
 
-bool tdl_buffer_free (tdl_buffer_t *buff);
-bool tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize);
-tdl_char_t *tdl_buffer_get_char (tdl_buffer_t *buff,
-				 tdl_point_t point);
-bool tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff);
-bool tdl_buffer_set_char (tdl_buffer_t *buff, tdl_point_t point,
-			  tdl_char_t tchar);
-bool tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point);
-
-sbvector_t _tdl_buff_allocate (tdl_size_t size);
-bool _tdl_buff_free (sbvector_t *vec);
-
-#endif  /* TDL_BUFFER_H */
+#endif /* TDL_BUFFER_T */

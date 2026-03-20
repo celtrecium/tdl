@@ -19,7 +19,6 @@
 #ifndef TDL_TEXT_H
 #define TDL_TEXT_H
 
-#include <sbvector.h>
 #include <u8string.h>
 #include "tdl_style.h"
 #include "tdl_symbols_export.h"

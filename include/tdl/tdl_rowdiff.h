@@ -16,24 +16,22 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef TDL_ROWDIFF_H
+#define TDL_ROWDIFF_H
 
-#ifndef TDL_BUFFERLINE_H
-#define TDL_BUFFERLINE_H
-
-#include <sbvector.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "tdl_symbols_export.h"
-#include "tdl_char.h"
 
-typedef struct tdl_buffer_line
+typedef struct tdl_rowdiff
 {
-  sbvector_t line;
-  bool _is_empty;
-} tdl_buffer_line_t;
+  size_t row_number;
+  size_t first_modified;
+  size_t last_modified;
+} tdl_rowdiff_t;
 
-tdl_buffer_line_t tdl_buffer_line (size_t width);
+tdl_rowdiff_t tdl_rowdiff (size_t row_n, size_t first, size_t last);
+bool tdl_rowdiff_set (tdl_rowdiff_t *rdiff, size_t modified);
+bool tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff);
 
-tdl_char_t *tdl_buffer_line_get (tdl_buffer_line_t *line, size_t index);
-bool tdl_buffer_line_free (tdl_buffer_line_t *line);
-bool tdl_buffer_line_copy (tdl_buffer_line_t *dest, tdl_buffer_line_t *src);
-
-#endif /* TDL_BUFFERLINE_H */
+#endif  /* TDL_ROWDIFF_H */

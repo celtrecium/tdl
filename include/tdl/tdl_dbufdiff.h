@@ -16,26 +16,17 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_IMAGE_H
-#define TDL_IMAGE_H
+#ifndef TDL_DBUFDIFF_H
+#define TDL_DBUFDIFF_H
 
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_canvas.h"
-#include <sbvector.h>
-#include <stdbool.h>
+#include "tdl/tdl_rowdiff.h"
 
-typedef struct tdl_image
-{
-  sbvector_t image;
-  tdl_size_t size;
-} tdl_image_t;
+typedef tdl_rowdiff_t *tdl_dbufdiff_t;
 
-TDL_API bool tdl_image_save (const tdl_image_t img, const char *filename);
-TDL_API tdl_image_t tdl_image_load (const char *filename);
-TDL_API tdl_image_t tdl_image_crop_from_canvas (tdl_canvas_t *canv,
-                                                tdl_rectangle_t rect);
-TDL_API bool tdl_image_free (tdl_image_t *img);
-TDL_API bool tdl_image_print_to_canvas (tdl_canvas_t *canv, tdl_image_t img,
-                                        tdl_point_t pos);
+tdl_dbufdiff_t tdl_dbufdiff (void);
+bool tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff);
+bool tdl_dbufdiff_clear (tdl_dbufdiff_t dbdiff);
+size_t tdl_dbufdiff_size (tdl_dbufdiff_t dbdiff);
+bool tdl_dbufdiff_free (tdl_dbufdiff_t dbdiff);
 
-#endif /* TDL_IMAGE_H */
+#endif /* TDL_DBUFDIFF_H */

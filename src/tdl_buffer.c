@@ -16,270 +16,176 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-
 #include "tdl/tdl_buffer.h"
-#include "tdl/tdl_bufferline.h"
+#include "tdl/tdl_row.h"
 #include "tdl/tdl_style.h"
-#include "tdl/tdl_bufferpoint.h"
-#include "tdl/tdl_geometry.h"
-#include <sbvector.h>
-#include <u8string.h>
 
-sbvector_t
-_tdl_buff_allocate (tdl_size_t size)
+typedef struct _header
 {
-  size_t i;
-  sbvector_t vec;
-  
-  vec = sbvector (sizeof (tdl_buffer_line_t));
-  sbv_resize (&vec, size.height);
+  size_t capacity, count;
+  tdl_size_t size;
+} _header_t;
 
-  for (i = 0; i < size.height; ++i)
-    sbv_set (&vec, tdl_buffer_line_t, i, tdl_buffer_line(size.width));
-
-  return vec;
-}
-
-bool
-_tdl_buff_free (sbvector_t *vec)
-{
-  size_t i;
-  
-  for (i = 0; i < vec->length; ++i)
-    if (!sbv_free (sbv_get (vec, sbvector_t, i)))
-      return false;
-
-  return sbv_free (vec);
-}
-
-static inline bool
-_tdl_buff_resize_height_up (sbvector_t *vec, tdl_size_t newsize)
-{
-  size_t i;
-
-  if (!sbv_resize (vec, newsize.height))
-    return false;
-
-  for (i = vec->length; i < newsize.height; ++i)
-    sbv_set (vec, sbvector_t, i, sbvector (sizeof (tdl_char_t)));
-  
-  return true;
-}
-
-static inline bool
-_tdl_buff_resize_height_downward (sbvector_t *vec, tdl_size_t newsize)
-{
-  size_t i;
-
-  for (i = newsize.height; i < vec->length; ++i)
-    if (!sbv_free (sbv_get (vec, sbvector_t, i)))
-      return false;
-
-  if (!sbv_resize (vec, newsize.height))
-    return false;
-
-  return true;
-}
-
-static inline bool
-_tdl_buff_resize_height (sbvector_t *vec, tdl_size_t newsize,
-                         tdl_size_t prevsize)
-{
-  
-  if (newsize.height > prevsize.height)
-    _tdl_buff_resize_height_up (vec, newsize);
-  else if (newsize.height > prevsize.height)
-    _tdl_buff_resize_height_downward (vec, newsize);
-
-  return true;
-}
-
-static inline bool
-_tdl_buff_resize_width_up (sbvector_t *vec, tdl_size_t newsize,
-                           tdl_size_t prevsize)
-{
-  size_t i, j;
-  tdl_char_t tchar;
-  sbvector_t *tmpptr;
-
-  tchar =
-    tdl_char (" ", tdl_style (tdl_char_color (256, 256), TDL_NO_ATTRIBUTES));
-
-  for (i = 0; i < vec->length; ++i)
-    {
-      tmpptr = sbv_get (vec, sbvector_t, i);
-
-      if (!sbv_resize (tmpptr, newsize.width))
-        return false;
-
-      for (j = prevsize.width; j < newsize.width; ++j)
-        sbv_set (tmpptr, tdl_char_t, j, tchar);
-    }
-
-  return true;
-}
-
-static inline bool
-_tdl_buff_resize_width_downward (sbvector_t *vec, tdl_size_t newsize)
-{
-  size_t i;
-  
-  for (i = 0; i < vec->length; ++i)
-    if (!sbv_resize (sbv_get (vec, sbvector_t, i), newsize.width))
-      return false;
-  
-  return true;
-}
-
-static inline bool
-_tdl_buff_resize_width (sbvector_t *vec, tdl_size_t newsize,
-                         tdl_size_t prevsize)
-{
-  if (newsize.width > prevsize.width)
-    _tdl_buff_resize_width_up (vec, newsize, prevsize);
-  else if (newsize.width < prevsize.width)
-    _tdl_buff_resize_width_downward (vec, newsize);
-
-  return true;
-}
-
-static bool
-_tdl_buff_resize (sbvector_t *vec, tdl_size_t prevsize, tdl_size_t newsize)
-{
-  if (!vec ||
-      !_tdl_buff_resize_height (vec, newsize, prevsize) ||
-      !_tdl_buff_resize_width(vec, newsize, prevsize))
-    return false;
-
-  return true;
-}
+#define HEADER(b) (((_header_t*) (b)) - 1)
+#define DATA(h) ((tdl_row_t*) ((h) + 1))
 
 tdl_buffer_t
 tdl_buffer (tdl_size_t size)
 {
-  tdl_buffer_t buff;
+  _header_t header = { .capacity = size.height, .count = size.height, .size = size };
+  _header_t *head = malloc (sizeof (_header_t) + sizeof (tdl_row_t)*size.height);
+  tdl_buffer_t buffer = NULL;
+  size_t i;
 
-  buff.size = size;
-  buff.is_doublebuffered = true;
+  *head = header;
+  buffer = DATA (head);
 
-  buff.fbuff = _tdl_buff_allocate (size);
-  buff.sbuff = _tdl_buff_allocate (size);
+  for (i = 0; i < header.count; ++i) {
+    buffer[i] = tdl_row (size.width);
+  }
 
-  return buff;
+  return buffer;
 }
 
-tdl_buffer_t
-tdl_single_buffer(tdl_size_t size)
+tdl_size_t
+tdl_buffer_size (tdl_buffer_t *buffer)
 {
-  tdl_buffer_t buff;
+  if (buffer == NULL)
+    return (tdl_size_t) { .width = 0, .height = 0 };
 
-  buff.size = size;
-  buff.is_doublebuffered = false;
-
-  buff.fbuff = _tdl_buff_allocate (size);
-  memset(&buff.sbuff, 0, sizeof(sbvector_t));
-
-  return buff;
-  
+  return HEADER(buffer)->size;
 }
 
 bool
-tdl_buffer_free (tdl_buffer_t *buff)
+tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
 {
-  buff->size = tdl_size (0, 0);
-
-  if (!buff)
+  _header_t *header = NULL;
+  _header_t *tmp = NULL;
+  size_t newcapacity, i;
+  
+  if (buffer == NULL)
     return false;
 
-  if (!buff->is_doublebuffered)
+  header = HEADER (*buffer);
+
+  if (header->count == newsize.height)
+    return true;
+
+  newcapacity = header->capacity * 2;
+
+  if (header->count >= newsize.height)
     {
-      if (!_tdl_buff_free (&buff->fbuff))
-	return false;
+      for (i = 0; i < newsize.height; ++i)
+	if (!tdl_row_resize (&(*buffer[i]), newsize.width))
+	  return false;
+
+      for (i = newsize.height; i < header->count; ++i)
+	tdl_row_free (*buffer[i]);
     }
-  else if (!_tdl_buff_free (&buff->fbuff) ||
-	   !_tdl_buff_free (&buff->sbuff))
-    return false;
-
-  return true;
-}
-
-bool
-tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize)
-{
-  if (!buff->is_doublebuffered)
+  else
     {
-      if (!buff || !_tdl_buff_resize (&buff->fbuff, buff->size, newsize))
-	return false;
+      if (header->capacity < newsize.height)
+	{
+	  while (newcapacity < newsize.height) newcapacity *= 2;
+
+	  tmp = realloc (header, sizeof (_header_t)
+			 + sizeof (tdl_row_t) * newcapacity);
+
+	  if (tmp == NULL)
+	    return false;
+	  
+	  header = tmp;
+	  *buffer = DATA (header);
+
+	  header->capacity = newcapacity;
+	}
+
+      for (i = 0; i < header->count; ++i)
+	if (!tdl_row_resize (&(*buffer[i]), newsize.width))
+	  return false;
+
+      for (i = header->count; i < newsize.height; ++i)
+	*buffer[i] = tdl_row (newsize.width);
     }
-  else if (!buff ||
-	   !_tdl_buff_resize (&buff->fbuff, buff->size, newsize) ||
-	   !_tdl_buff_resize (&buff->sbuff, buff->size, newsize))
-    return false;
 
-  buff->size = newsize;
-  
-  return true;
-}
-
-tdl_char_t *
-tdl_buffer_get_char (tdl_buffer_t *buff, tdl_point_t point)
-{
-  if (!buff)
-    return NULL;
-
-  return tdl_buffer_line_get (
-      sbv_get (&buff->fbuff, tdl_buffer_line_t, (size_t)point.y),
-      (size_t)point.x);
-}
-
-static inline tdl_char_t *
-_tdl_sbuffer_get_char (tdl_buffer_t *buff, tdl_point_t point)
-{
-  return tdl_buffer_line_get (
-      sbv_get (&buff->sbuff, tdl_buffer_line_t, (size_t)point.y),
-      (size_t)point.x);
-}
-
-bool
-tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point)
-{
-  tdl_char_t *fch = tdl_buffer_get_char (buff, point);
-  tdl_char_t *sch = _tdl_sbuffer_get_char (buff, point);
-  
-  return tdl_style_compare (&fch->style, &sch->style)
-         && u8char_compare (fch->ch, sch->ch);
-}
-
-bool
-tdl_buffer_set_char (tdl_buffer_t *buff, tdl_point_t point,
-                      tdl_char_t tchar)
-{
-  tdl_buffer_line_t *bl;
-  
-  if (!buff)
-    return false;
-
-  bl = sbv_get (&buff->fbuff, tdl_buffer_line_t, (size_t)point.y);
-
-  bl->_is_empty = false;
-  *tdl_buffer_line_get (bl, (size_t)point.x) = tchar;
+  header->count = newsize.height;
+  header->size = newsize;
   
   return true;
 }
 
 bool
-tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff)
+tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src)
 {
+  tdl_size_t src_size;
   size_t i;
   
-  if (!buff)
+  if (dest == NULL || src == NULL || *dest == NULL || *src == NULL)
     return false;
 
-  for (i = 0; i < buff->size.height; ++i)
-    {
-      tdl_buffer_line_copy (sbv_get (&buff->sbuff, tdl_buffer_line_t, i),
-                            sbv_get (&buff->fbuff, tdl_buffer_line_t, i));
-    }
+  src_size = HEADER(*src)->size;
+  
+  if (!tdl_buffer_resize (dest, src_size))
+    return false;
 
+  for (i = 0; i < src_size.height; ++i)
+    if(!tdl_row_copy (&(*dest[i]), &(*src[i])))
+      return false;
+  
+  return true;
+}
+
+bool
+tdl_buffer_free (tdl_buffer_t buffer)
+{
+  size_t i;
+  _header_t *header;
+
+  if (buffer == NULL)
+    return false;
+
+  header = HEADER (buffer);
+
+  for (i = 0; i < header->count; ++i) 
+    if (!tdl_row_free (buffer[i]))
+      return false;
+
+  free (header);
+  
+  return true;
+}
+
+bool
+tdl_buffer_clear_row (tdl_buffer_t buff, size_t row_n)
+{
+  size_t i, w;
+  tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
+  
+  if (buff == NULL)
+    return false;
+
+  tdl_row_set_clear(buff[row_n], true);
+
+  w = tdl_row_size (buff[row_n]);
+
+  for (i = 0; i < w; ++i)
+    buff[row_n][i] = empty_char;
+  
+  return true;
+}
+
+bool
+tdl_buffer_clear (tdl_buffer_t buff)
+{
+  size_t h, i;
+  
+  if (buff == NULL)
+    return false;
+
+  h = HEADER(buff)->count;
+
+  for (i = 0; i < h; ++i)
+    tdl_buffer_clear_row (buff, i);
+  
   return true;
 }
