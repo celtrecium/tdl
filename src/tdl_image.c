@@ -318,7 +318,8 @@ tdl_image_print_to_canvas (tdl_canvas_t *canv, tdl_image_t img,
   if (!canv || !img.size.height || !img.size.width)
     return false;
 
-  _set_rectangle_diff (canv, tdl_rectangle (pos, img.size));
+  if (canv->buffer.is_doublebuffered)
+    _set_rectangle_diff (canv, tdl_rectangle (pos, img.size));
 
   for (i = 0; i < canv_slice.length; ++i)
     _copy_line_to_canvas (sbslice_get (&canv_slice, tdl_buffer_line_t, i),

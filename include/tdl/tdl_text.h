@@ -26,15 +26,14 @@
 
 typedef struct tdl_text
 {
-  u8string_t string;
+  char *string;
   tdl_style_t style;
 } tdl_text_t;
 
-TDL_API tdl_text_t tdl_text (u8string_t string, tdl_style_t style);
-TDL_API bool tdl_text_free (tdl_text_t text);
+TDL_API tdl_text_t tdl_text (char *string, tdl_style_t style);
 
-#define tdl_default_text(string)                                              \
-  tdl_text (u8string (string),                                                \
+#define tdl_default_text(string)					\
+  tdl_text (string,							\
             tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
 
 #endif  /* TDL_TEXT_H */

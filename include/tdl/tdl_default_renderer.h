@@ -16,23 +16,11 @@
  * <https://www.gnu.org/licenses/>.
  */
 
+#ifndef TDL_DEFAULT_RENDERER_H
+#define TDL_DEFAULT_RENDERER_H
 
-#ifndef TDL_BUFFERPOINT_H
-#define TDL_BUFFERPOINT_H
+#include "tdl_renderer.h"
 
-#include <u8string.h>
-#include "tdl_style.h"
-#include "tdl_symbols_export.h"
+TDL_API extern tdl_renderer_t tdl_default_renderer;
 
-typedef struct tdl_buffer_point
-{
-  u8char_t character;
-  tdl_style_t style;
-} tdl_buffer_point_t;
-
-TDL_API tdl_buffer_point_t tdl_buffer_point (u8char_t uchar, tdl_style_t style);
-TDL_API bool tdl_buffpt_copy (tdl_buffer_point_t *dest, tdl_buffer_point_t *src);
-TDL_API bool tdl_buffpt_compare (tdl_buffer_point_t *first,
-				 tdl_buffer_point_t *second);
-
-#endif /* TDL_BUFFERPOINT_H */
+#endif /* TDL_DEFAULT_RENDERER_H */

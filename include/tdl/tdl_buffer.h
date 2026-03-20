@@ -32,9 +32,12 @@ typedef struct tdl_buffer
   sbvector_t fbuff; /* First buffer */
   sbvector_t sbuff; /* Second buffer */
   tdl_size_t size;
+  bool is_doublebuffered;
 } tdl_buffer_t;
 
-tdl_buffer_t tdl_buffer (tdl_size_t size);
+tdl_buffer_t tdl_buffer(tdl_size_t size);
+tdl_buffer_t tdl_single_buffer(tdl_size_t size);
+
 bool tdl_buffer_free (tdl_buffer_t *buff);
 bool tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize);
 tdl_buffer_point_t *tdl_buffer_get_point (tdl_buffer_t *buff,

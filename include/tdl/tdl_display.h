@@ -22,6 +22,11 @@
 
 #include "tdl_canvas.h"
 #include "tdl_symbols_export.h"
+#include "tdl_renderer.h"
+
+/* Display function with custom renderer */
+TDL_API bool tdl_display_with_renderer (tdl_canvas_t *canv,
+					tdl_renderer_t renderer);
 
 /* Display function */
 TDL_API bool tdl_display (tdl_canvas_t *canv);

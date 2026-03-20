@@ -38,13 +38,13 @@ typedef struct tdl_canvas
 
 /* 1. Create/destroy canvas functions */
 TDL_API tdl_canvas_t *tdl_canvas (void);
+TDL_API tdl_canvas_t *tdl_canvas_with (tdl_size_t size, bool is_doublebuffered);
 TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
 TDL_API bool tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
 TDL_API bool tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 TDL_API bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
-
 TDL_API bool tdl_clear (tdl_canvas_t *canv);
 
 #endif /* TDL_CANVAS_H */

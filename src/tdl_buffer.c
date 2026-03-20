@@ -160,11 +160,27 @@ tdl_buffer (tdl_size_t size)
   tdl_buffer_t buff;
 
   buff.size = size;
+  buff.is_doublebuffered = true;
 
   buff.fbuff = _tdl_buff_allocate (size);
   buff.sbuff = _tdl_buff_allocate (size);
 
   return buff;
+}
+
+tdl_buffer_t
+tdl_single_buffer(tdl_size_t size)
+{
+  tdl_buffer_t buff;
+
+  buff.size = size;
+  buff.is_doublebuffered = false;
+
+  buff.fbuff = _tdl_buff_allocate (size);
+  memset(&buff.sbuff, 0, sizeof(sbvector_t));
+
+  return buff;
+  
 }
 
 bool
@@ -174,9 +190,14 @@ tdl_buffer_free (tdl_buffer_t *buff)
 
   if (!buff)
     return false;
-  
-  if (!_tdl_buff_free (&buff->fbuff) ||
-      !_tdl_buff_free (&buff->sbuff))
+
+  if (!buff->is_doublebuffered)
+    {
+      if (!_tdl_buff_free (&buff->fbuff))
+	return false;
+    }
+  else if (!_tdl_buff_free (&buff->fbuff) ||
+	   !_tdl_buff_free (&buff->sbuff))
     return false;
 
   return true;
@@ -185,9 +206,14 @@ tdl_buffer_free (tdl_buffer_t *buff)
 bool
 tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize)
 {
-  if (!buff ||
-      !_tdl_buff_resize (&buff->fbuff, buff->size, newsize) ||
-      !_tdl_buff_resize (&buff->sbuff, buff->size, newsize))
+  if (!buff->is_doublebuffered)
+    {
+      if (!buff || !_tdl_buff_resize (&buff->fbuff, buff->size, newsize))
+	return false;
+    }
+  else if (!buff ||
+	   !_tdl_buff_resize (&buff->fbuff, buff->size, newsize) ||
+	   !_tdl_buff_resize (&buff->sbuff, buff->size, newsize))
     return false;
 
   buff->size = newsize;

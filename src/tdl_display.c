@@ -16,105 +16,28 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_display.h"
+#include "tdl/tdl_canvas.h"
 #include "tdl/tdl_linediff.h"
-#include "tdl/tdl_style.h"
-#include "tdl/tdl_buffer.h"
 #include "tdl/tdl_bufferline.h"
-#include <sbvector.h>
+#include "tdl/tdl_default_renderer.h"
+#include "tdl/tdl_renderer.h"
+#include "tdl/tdl_renderer_signals.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include "tdl/tdl_ansi_sequences.h"
-
-
-typedef struct tdl_display_signal
-{
-  bool display_color_bg;
-  bool display_color_fg;
-  bool display_attribute;
-} _tdl_display_signal_t;
-
-static const tdl_attributes_t _attrib_val[] = {
-  TDL_BOLD,
-  TDL_ITALIC,
-  TDL_UNDERLINE,
-  TDL_CROSSED_OUT,
-  TDL_DIM
-};
-
-static const char *_attrib_str[] = {
-  ";1", /* Bold */
-  ";3", /* Italic */
-  ";4", /* Underline */
-  ";9", /* Crossed out */
-  ";2"  /* Dim */
-};
-
-static const size_t _ATTRIB_NUM
-    = sizeof (_attrib_val) / sizeof (_attrib_val[0]);
-
-static inline _tdl_display_signal_t
-_tdl_display_signal (bool bg, bool fg, bool attrib)
-{
-  return (_tdl_display_signal_t){ bg, fg, attrib };
-}
-
-static _tdl_display_signal_t
-_tdl_display_state (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
-{
-  _tdl_display_signal_t ret = _tdl_display_signal (false, false, false);
-
-  if (!prev)
-    return _tdl_display_signal (true, true, true);
-
-  ret.display_attribute = curr->style.attributes != prev->style.attributes;
-  ret.display_color_bg = curr->style.color.bg != prev->style.color.bg;
-  ret.display_color_fg = curr->style.color.fg != prev->style.color.fg;
-
-  return ret;
-}
-
-static void
-_tdl_print_attributes (tdl_buffer_point_t *curr)
-{
-  size_t i = 0;
-  tdl_attributes_t attrib = curr->style.attributes;
-
-  fputs (ESC, stdout);
-  
-  for (i = 0; i < _ATTRIB_NUM; ++i)
-    {
-      if ((attrib & _attrib_val[i]) == _attrib_val[i])
-        fputs (_attrib_str[i], stdout);
-    }
-
-  fputs (ATTRIBUTE, stdout);
-}
-
-static inline void
-_tdl_print_bg_color (tdl_color_t color)
-{
-  if (color == TDL_DEFAULT_COLOR)
-    fputs (ESC "49" ATTRIBUTE, stdout);
-  else
-    printf (ESC BG_COLOR "%u" ATTRIBUTE, color);
-}
-
-static inline void
-_tdl_print_fg_color (tdl_color_t color)
-{
-  if (color == TDL_DEFAULT_COLOR)
-    fputs (ESC "39" ATTRIBUTE, stdout);
-  else
-    printf (ESC FG_COLOR "%u" ATTRIBUTE, color);
-}
 
 static bool
-_tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
+_tdl_render_doublebuffered_line (tdl_renderer_t renderer,
+				 sbvector_t *line,
+				 tdl_ldiff_t *ldiff)
 {
   size_t i = 0;
-  _tdl_display_signal_t dispsig;
   tdl_buffer_point_t *curr = NULL, *prev = NULL;
+
+  if (renderer.render_before_line != NULL) {
+    renderer.render_before_line((tdl_point_t) {
+	.x = (int) ldiff->first_modified,
+	.y = (int) ldiff->line_number },
+      renderer.optional_data);
+  }
 
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
@@ -123,45 +46,47 @@ _tdl_print_line (sbvector_t *line, tdl_ldiff_t *ldiff)
       if (!curr)
         return false;
 
-      dispsig = _tdl_display_state (curr, prev);
-
-      if (dispsig.display_attribute)
-        _tdl_print_attributes (curr);
-
-      if (dispsig.display_color_bg)
-        _tdl_print_bg_color (curr->style.color.bg);
-
-      if (dispsig.display_color_fg)
-        _tdl_print_fg_color (curr->style.color.fg);
-
-      fputs (curr->character, stdout);
-
+      tdl_renderer_signals_t signals = tdl_get_renderer_signals (curr, prev);
+      
+      renderer.render_char((tdl_point_t) {
+	  .x = (int) i,
+	  .y = (int) ldiff->line_number
+	},
+	signals,
+	curr,
+	renderer.optional_data);
+      
       prev = curr;
     }
 
   return true;
 }
 
-bool
-tdl_display (tdl_canvas_t *canv)
+static bool
+_tdl_display_render_doublebuffered(tdl_canvas_t *canv, tdl_renderer_t renderer)
 {
   size_t i;
   tdl_ldiff_t *ldiffptr;
   tdl_buffer_line_t *bl;
 
+  if (renderer.render_char == NULL)
+    return false;
+  
   if(canv->diff.length == 0)
     return true;
-  
+ 
   for (i = 0; i < canv->diff.length; ++i)
     {
       ldiffptr = sbv_get (&canv->diff, tdl_ldiff_t, i);
       bl       = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t,
                     ldiffptr->line_number);
 
-      if (bl->_is_empty)
+      if (bl->_is_empty && renderer.render_empty_line != NULL)
         {
-          printf (ESC "%zu;1" CURSOR_POS ESC ATTRIBUTE ESC ERASE_LINE,
-                  ldiffptr->line_number + 1);
+	  renderer.render_empty_line((tdl_point_t) {
+	      .x = 0,
+	      .y = (int) ldiffptr->line_number },
+	    renderer.optional_data);
 
           continue;
         }
@@ -170,16 +95,91 @@ tdl_display (tdl_canvas_t *canv)
 
       if (ldiffptr->first_modified > ldiffptr->last_modified)
         continue;
-      
-      printf (ESC "%zu;%zu" CURSOR_POS, ldiffptr->line_number + 1,
-              ldiffptr->first_modified + 1);
 
-      _tdl_print_line (&bl->line, ldiffptr);
+      _tdl_render_doublebuffered_line (renderer, &bl->line, ldiffptr);
     }
 
-  fflush(stdout);
   tdl_buffer_fbuff_to_sbuff (&canv->buffer);
   sbv_clear (&canv->diff);
+
+  return true;
+}
+
+static bool
+_tdl_render_singlebuffered_line (tdl_renderer_t renderer,
+				 sbvector_t *line,
+				 size_t line_number)
+{
+  static const tdl_renderer_signals_t signals =
+    {
+      .set_attribute = true,
+      .set_color_bg = true,
+      .set_color_fg = true
+    };
+  
+  size_t i = 0;
+  tdl_buffer_point_t *curr = NULL;
+
+  if (renderer.render_before_line != NULL) {
+    renderer.render_before_line((tdl_point_t) {
+	.x = 0, .y = (int) line_number
+      },
+      renderer.optional_data);
+  }
+
+  for (i = 0; i < line->length; ++i)
+    {
+      curr = sbv_get (line, tdl_buffer_point_t, i);
+      
+      if (!curr)
+        return false;
+
+      renderer.render_char((tdl_point_t) {
+	  .x = (int) i, .y = (int) line_number
+	},
+	signals,
+	curr,
+	renderer.optional_data);
+    }
+
+  return true;
+}
+
+static bool
+_tdl_display_render_singlebuffered(tdl_canvas_t *canv, tdl_renderer_t renderer)
+{
+  size_t y;
+  tdl_buffer_line_t *bl;
+
+  if (renderer.render_char == NULL)
+    return false;
+  
+  for (y = 0; y < canv->buffer.fbuff.length; ++y)
+    {
+      bl = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, y);
+
+      _tdl_render_singlebuffered_line (renderer, &bl->line, y);
+    }
+
+  tdl_buffer_fbuff_to_sbuff (&canv->buffer);
+  sbv_clear (&canv->diff);
+
+  return true;
+}
+
+bool
+tdl_display_with_renderer (tdl_canvas_t *canv, tdl_renderer_t renderer)
+{
+  return canv->buffer.is_doublebuffered
+    ? _tdl_display_render_doublebuffered(canv, renderer)
+    : _tdl_display_render_singlebuffered(canv, renderer);
+}
+
+bool
+tdl_display (tdl_canvas_t *canv)
+{
+  tdl_display_with_renderer (canv, tdl_default_renderer);
+  fflush (stdout);
   
   return true;
 }

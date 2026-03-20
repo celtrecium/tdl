@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "tdl/tdl_style.h"
+#include "u8string.h"
 
 #if defined(__unix__)
 #  include <termios.h>
@@ -88,17 +89,31 @@ _tdl_set_diff (sbvector_t *sbv, tdl_point_t modpt)
 }
 
 tdl_canvas_t *
-tdl_canvas (void)
+tdl_canvas_with (tdl_size_t size, bool is_doublebuffered)
 {
   tdl_canvas_t *canv = calloc (1, sizeof (tdl_canvas_t));
   
   canv->cursor = tdl_point (0, 0);
-  canv->size = _tdl_get_term_size ();
-  canv->diff = sbvector (sizeof (tdl_ldiff_t));
+  canv->size = size;
 
-  canv->buffer = tdl_buffer (canv->size);
+  if (is_doublebuffered)
+    {
+      canv->diff = sbvector (sizeof (tdl_ldiff_t));
+      canv->buffer = tdl_buffer (canv->size);
+    }
+  else
+    {
+      memset (&canv->diff, 0, sizeof(sbvector_t));
+      canv->buffer = tdl_single_buffer (canv->size);
+    }
 
   return canv;
+}
+
+tdl_canvas_t *
+tdl_canvas (void)
+{
+  return tdl_canvas_with (_tdl_get_term_size(), true);
 }
 
 bool
@@ -107,7 +122,9 @@ tdl_destroy_canvas (tdl_canvas_t *canv)
   if (!canv)
     return false;
 
-  sbv_free (&canv->diff);
+  if (canv->buffer.is_doublebuffered)
+      sbv_free (&canv->diff);
+
   tdl_buffer_free (&canv->buffer);
 
   free (canv);
@@ -131,28 +148,43 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
 {
   tdl_point_t cur;
   cur = canv->cursor;
-      
-  if (u8char_compare (ch.character, "\n"))
-    {
+
+  switch (ch.character[0]) {
+  case '\n':
       ++cur.y;
+      tdl_set_cursor_pos (canv, cur);
+
+      // fall through
+      return true;
+  case '\r':
       cur.x = 0;
       tdl_set_cursor_pos (canv, cur);
 
+      // fall through
       return true;
-    }
-  else if (u8char_compare (ch.character, "\t"))
-    {
+  case '\t':
       cur.x += 8;             /* Tab character size */
       tdl_set_cursor_pos (canv, cur);
 
       return true;
-    }
+  case '\b':
+    --cur.x;
+    tdl_set_cursor_pos (canv, cur);
+    tdl_buffer_set_point (
+      &canv->buffer, canv->cursor,
+      tdl_buffer_point (" ", ch.style));
+
+    return true;
+  case '\a':
+    return true;
+  }
 
   tdl_buffer_set_point (
       &canv->buffer, canv->cursor,
       tdl_buffer_point (ch.character, ch.style));
 
-  if (!tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
+  if (canv->buffer.is_doublebuffered
+      && !tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
     _tdl_set_diff (&canv->diff, canv->cursor);
 
   ++cur.x;
@@ -165,12 +197,19 @@ bool
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
+  char *offset_ptr = NULL;
+  u8char_t ch_buff;
   
   if (!canv)
     return false;
 
-  for (i = 0; i < text.string.length; ++i)
-    tdl_putchar(canv, tdl_char (text.string.string[i], text.style));
+  offset_ptr = text.string;
+  
+  for (i = 0; i < u8str_strlen(text.string); ++i)
+    {
+      offset_ptr = u8string_next_char(offset_ptr, &ch_buff);
+      tdl_putchar(canv, tdl_char (ch_buff, text.style));
+    }
   
   return true;
 }
@@ -178,17 +217,30 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 static inline void
 _tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
 {
-  tdl_buffer_point_t bpt = { " ", { TDL_NO_ATTRIBUTES, { 256, 256 } } };
+  tdl_buffer_point_t bpt = {
+    " ",
+    { TDL_NO_ATTRIBUTES,
+      { 256, 256,
+	{ 0xFF, 0xFF, 0xFF },
+	{ 0xFF, 0xFF, 0xFF }
+      }
+    }
+  };
+
   tdl_buffer_line_t *bl
       = sbv_get (&canv->buffer.fbuff, tdl_buffer_line_t, line_num);
 
-  tdl_point_t beg_modpt = (tdl_point_t){ 0, (int)line_num };
-  tdl_point_t end_modpt
-    = (tdl_point_t){ (int)canv->size.width, (int)line_num };
-  
+  if (canv->buffer.is_doublebuffered)
+    {
+      tdl_point_t beg_modpt = (tdl_point_t){ 0, (int)line_num };
+      tdl_point_t end_modpt
+	= (tdl_point_t){ (int)canv->size.width, (int)line_num };
+
+      _tdl_set_diff (&canv->diff, beg_modpt);
+      _tdl_set_diff (&canv->diff, end_modpt);
+    }
+
   sbv_fill (&bl->line, &bpt, bl->line.length);
-  _tdl_set_diff (&canv->diff, beg_modpt);
-  _tdl_set_diff (&canv->diff, end_modpt);
 
   bl->_is_empty = true;
 }
