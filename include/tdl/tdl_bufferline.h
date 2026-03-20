@@ -20,9 +20,9 @@
 #ifndef TDL_BUFFERLINE_H
 #define TDL_BUFFERLINE_H
 
-#include "tdl_bufferpoint.h"
 #include <sbvector.h>
 #include "tdl_symbols_export.h"
+#include "tdl_char.h"
 
 typedef struct tdl_buffer_line
 {
@@ -32,8 +32,7 @@ typedef struct tdl_buffer_line
 
 tdl_buffer_line_t tdl_buffer_line (size_t width);
 
-tdl_buffer_point_t *tdl_buffer_line_get (tdl_buffer_line_t *line,
-                                         size_t index);
+tdl_char_t *tdl_buffer_line_get (tdl_buffer_line_t *line, size_t index);
 bool tdl_buffer_line_free (tdl_buffer_line_t *line);
 bool tdl_buffer_line_copy (tdl_buffer_line_t *dest, tdl_buffer_line_t *src);
 

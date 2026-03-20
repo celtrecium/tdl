@@ -149,7 +149,7 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   tdl_point_t cur;
   cur = canv->cursor;
 
-  switch (ch.character[0]) {
+  switch (ch.ch[0]) {
   case '\n':
       ++cur.y;
       tdl_set_cursor_pos (canv, cur);
@@ -170,18 +170,18 @@ bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   case '\b':
     --cur.x;
     tdl_set_cursor_pos (canv, cur);
-    tdl_buffer_set_point (
+    tdl_buffer_set_char (
       &canv->buffer, canv->cursor,
-      tdl_buffer_point (" ", ch.style));
+      tdl_char (" ", ch.style));
 
     return true;
   case '\a':
     return true;
   }
 
-  tdl_buffer_set_point (
+  tdl_buffer_set_char (
       &canv->buffer, canv->cursor,
-      tdl_buffer_point (ch.character, ch.style));
+      tdl_char (ch.ch, ch.style));
 
   if (canv->buffer.is_doublebuffered
       && !tdl_buffer_check_point_mod (&canv->buffer, canv->cursor))
@@ -217,7 +217,7 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 static inline void
 _tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
 {
-  tdl_buffer_point_t bpt = {
+  tdl_char_t tchar = {
     " ",
     { TDL_NO_ATTRIBUTES,
       { 256, 256,
@@ -240,7 +240,7 @@ _tdl_canvas_line_clear (tdl_canvas_t *canv, size_t line_num)
       _tdl_set_diff (&canv->diff, end_modpt);
     }
 
-  sbv_fill (&bl->line, &bpt, bl->line.length);
+  sbv_fill (&bl->line, &tchar, bl->line.length);
 
   bl->_is_empty = true;
 }

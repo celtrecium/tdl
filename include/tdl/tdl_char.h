@@ -16,16 +16,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDL_LETTER_H
-#define TDL_LETTER_H
+#ifndef TDL_CHAR_H
+#define TDL_CHAR_H
 
-#include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_symbols_export.h"
 #include <u8string.h>
 
-typedef tdl_buffer_point_t tdl_char_t;
+typedef struct tdl_char
+{
+  u8char_t ch;
+  tdl_style_t style;
+} tdl_char_t;
 
-TDL_API tdl_char_t tdl_char (u8char_t ch, tdl_style_t style);
+TDL_API tdl_char_t tdl_char (u8char_t uchar, tdl_style_t style);
+TDL_API bool tdl_char_copy (tdl_char_t *dest, tdl_char_t *src);
+TDL_API bool tdl_char_compare (tdl_char_t *first, tdl_char_t *second);
 
-#endif  /* TDL_LETTER_H */
+#endif  /* TDL_CHAR_H */

@@ -63,34 +63,34 @@ typedef struct tdl_rgb {
   uint8_t b;
 } tdl_rgb_t;
 
-typedef struct tdl_point_color
+typedef struct tdl_char_color
 {
   tdl_color_t bg, fg;
 
   tdl_rgb_t bg_rgb;
   tdl_rgb_t fg_rgb;
 
-} tdl_point_color_t;
+} tdl_char_color_t;
 
 typedef struct tdl_style
 {
   tdl_attributes_t attributes;
-  tdl_point_color_t color;
+  tdl_char_color_t color;
 } tdl_style_t;
 
-TDL_API tdl_point_color_t tdl_point_color (tdl_color_t bg, tdl_color_t fg);
-TDL_API tdl_point_color_t tdl_point_color_rgb (tdl_rgb_t bg, tdl_rgb_t fg);
-TDL_API tdl_point_color_t tdl_point_color_rgb_bg (tdl_rgb_t bg, tdl_color_t fg);
-TDL_API tdl_point_color_t tdl_point_color_rgb_fg (tdl_color_t bg, tdl_rgb_t fg);
+TDL_API tdl_char_color_t tdl_char_color (tdl_color_t bg, tdl_color_t fg);
+TDL_API tdl_char_color_t tdl_char_color_rgb (tdl_rgb_t bg, tdl_rgb_t fg);
+TDL_API tdl_char_color_t tdl_char_color_rgb_bg (tdl_rgb_t bg, tdl_color_t fg);
+TDL_API tdl_char_color_t tdl_char_color_rgb_fg (tdl_color_t bg, tdl_rgb_t fg);
 TDL_API tdl_attributes_t __tdl_attributes_intern (tdl_attributes_t attrs, ...);
-TDL_API tdl_style_t tdl_style (tdl_point_color_t color, tdl_attributes_t attrs);
+TDL_API tdl_style_t tdl_style (tdl_char_color_t color, tdl_attributes_t attrs);
 TDL_API bool tdl_style_compare (tdl_style_t *first, tdl_style_t *second);
 TDL_API tdl_rgb_t tdl_rgb (uint8_t r, uint8_t g, uint8_t b);
 TDL_API bool tdl_rgb_compare (tdl_rgb_t first, tdl_rgb_t second);
 
-#define tdl_default_point_color tdl_point_color (256, 256)
+#define tdl_default_char_color tdl_char_color (256, 256)
 #define tdl_default_style                                                     \
-  tdl_style (tdl_default_point_color, TDL_NO_ATTRIBUTES)
+  tdl_style (tdl_default_char_color, TDL_NO_ATTRIBUTES)
 #define tdl_attributes(...) \
   __tdl_attributes_intern (__VA_ARGS__, LAST_STYLES_ARG)
 

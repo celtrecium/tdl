@@ -17,7 +17,7 @@
  */
 
 #include "tdl/tdl_renderer_signals.h"
-#include "tdl/tdl_bufferpoint.h"
+#include "tdl/tdl_style.h"
 
 tdl_renderer_signals_t
 tdl_renderer_signals (void)
@@ -31,7 +31,7 @@ tdl_renderer_signals (void)
 }
 
 tdl_renderer_signals_t
-tdl_get_renderer_signals (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
+tdl_get_renderer_signals (tdl_char_t *curr, tdl_char_t *prev)
 {
   if (!prev)
     return (tdl_renderer_signals_t)
@@ -44,8 +44,11 @@ tdl_get_renderer_signals (tdl_buffer_point_t *curr, tdl_buffer_point_t *prev)
   tdl_renderer_signals_t signals;
   
   signals.set_attribute = curr->style.attributes != prev->style.attributes;
-  signals.set_color_bg = curr->style.color.bg != prev->style.color.bg;
-  signals.set_color_fg = curr->style.color.fg != prev->style.color.fg;
+  signals.set_color_bg = (curr->style.color.bg != prev->style.color.bg)
+    || !tdl_rgb_compare(curr->style.color.bg_rgb, prev->style.color.bg_rgb);
+
+  signals.set_color_fg = (curr->style.color.fg != prev->style.color.fg)
+    || !tdl_rgb_compare(curr->style.color.fg_rgb, prev->style.color.fg_rgb);
 
   return signals;
 }

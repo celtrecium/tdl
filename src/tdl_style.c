@@ -20,10 +20,10 @@
 #include <stdarg.h>
 #include <string.h>
 
-tdl_point_color_t
-tdl_point_color (tdl_color_t bg, tdl_color_t fg)
+tdl_char_color_t
+tdl_char_color (tdl_color_t bg, tdl_color_t fg)
 {
-  tdl_point_color_t pcolor;
+  tdl_char_color_t pcolor;
 
   pcolor.bg = bg;
   pcolor.fg = fg;
@@ -55,7 +55,7 @@ __tdl_attributes_intern (tdl_attributes_t attrs, ...)
 }
 
 tdl_style_t
-tdl_style (tdl_point_color_t color, tdl_attributes_t attrs)
+tdl_style (tdl_char_color_t color, tdl_attributes_t attrs)
 {
   tdl_style_t style;
 
@@ -91,10 +91,10 @@ tdl_rgb(uint8_t r, uint8_t g, uint8_t b)
   return (tdl_rgb_t) { r, g, b };
 }
 
-tdl_point_color_t
-tdl_point_color_rgb (tdl_rgb_t bg, tdl_rgb_t fg)
+tdl_char_color_t
+tdl_char_color_rgb (tdl_rgb_t bg, tdl_rgb_t fg)
 {
-  return (tdl_point_color_t) {
+  return (tdl_char_color_t) {
     .bg = TDL_RGB_COLOR,
     .fg = TDL_RGB_COLOR,
     .bg_rgb = bg,
@@ -102,10 +102,10 @@ tdl_point_color_rgb (tdl_rgb_t bg, tdl_rgb_t fg)
   };
 }
 
-tdl_point_color_t
-tdl_point_color_rgb_bg (tdl_rgb_t bg, tdl_color_t fg)
+tdl_char_color_t
+tdl_char_color_rgb_bg (tdl_rgb_t bg, tdl_color_t fg)
 {
-  return (tdl_point_color_t) {
+  return (tdl_char_color_t) {
     .bg = TDL_RGB_COLOR,
     .fg = fg,
     .bg_rgb = bg,
@@ -113,10 +113,10 @@ tdl_point_color_rgb_bg (tdl_rgb_t bg, tdl_color_t fg)
   };
 }
 
-tdl_point_color_t
-tdl_point_color_rgb_fg (tdl_color_t bg, tdl_rgb_t fg)
+tdl_char_color_t
+tdl_char_color_rgb_fg (tdl_color_t bg, tdl_rgb_t fg)
 {
-  return (tdl_point_color_t) {
+  return (tdl_char_color_t) {
     .bg = bg,
     .fg = TDL_RGB_COLOR,
     .bg_rgb = { 0x00, 0x00, 0x00 },

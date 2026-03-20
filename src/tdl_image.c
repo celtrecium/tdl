@@ -19,6 +19,7 @@
 #include "tdl/tdl_image.h"
 #include "tdl/tdl_bufferpoint.h"
 #include "tdl/tdl_canvas.h"
+#include "tdl/tdl_char.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_bufferline.h"
 #include "tdl/tdl_linediff.h"
@@ -58,12 +59,14 @@ _read_size (FILE *file, tdl_size_t *size)
 }
 
 static inline void
-_write_point (FILE *file, tdl_buffer_point_t *point)
+_write_tchar (FILE *file, tdl_char_t *tchar)
 {
-  fwrite (point->character, sizeof (char), U8CHAR_LEN, file);
-  fwrite (&point->style.attributes, sizeof (tdl_attributes_t), 1, file);
-  fwrite (&point->style.color.bg, sizeof (tdl_color_t), 1, file);
-  fwrite (&point->style.color.fg, sizeof (tdl_color_t), 1, file);
+  fwrite (tchar->ch, sizeof (char), U8CHAR_LEN, file);
+  fwrite (&tchar->style.attributes, sizeof (tdl_attributes_t), 1, file);
+  fwrite (&tchar->style.color.bg, sizeof (tdl_color_t), 1, file);
+  fwrite (&tchar->style.color.fg, sizeof (tdl_color_t), 1, file);
+  fwrite (&tchar->style.color.bg_rgb, sizeof (tdl_rgb_t), 1, file);
+  fwrite (&tchar->style.color.fg_rgb, sizeof (tdl_rgb_t), 1, file);
 }
 
 static inline void
@@ -72,7 +75,7 @@ _write_line (FILE *file, tdl_buffer_line_t *line)
   size_t i = 0;
 
   for (i = 0; i < line->line.length; ++i)
-    _write_point (file, sbv_get (&line->line, tdl_buffer_point_t, i));
+    _write_tchar (file, sbv_get (&line->line, tdl_char_t, i));
 }
 
 static inline void
@@ -85,12 +88,14 @@ _write_image (FILE *file, tdl_image_t *img)
 }
 
 static inline void
-_read_point (tdl_buffer_point_t *point, FILE *file)
+_read_tchar (tdl_char_t *tchar, FILE *file)
 {
-  fread (&point->character, sizeof (char), U8CHAR_LEN, file);
-  fread (&point->style.attributes, sizeof (tdl_attributes_t), 1, file);
-  fread (&point->style.color.bg, sizeof (tdl_color_t), 1, file);
-  fread (&point->style.color.fg, sizeof (tdl_color_t), 1, file);
+  fread (&tchar->ch, sizeof (char), U8CHAR_LEN, file);
+  fread (&tchar->style.attributes, sizeof (tdl_attributes_t), 1, file);
+  fread (&tchar->style.color.bg, sizeof (tdl_color_t), 1, file);
+  fread (&tchar->style.color.fg, sizeof (tdl_color_t), 1, file);
+  fread (&tchar->style.color.bg_rgb, sizeof (tdl_rgb_t), 1, file);
+  fread (&tchar->style.color.fg_rgb, sizeof (tdl_rgb_t), 1, file);
 }
 
 static inline void
@@ -99,7 +104,7 @@ _read_line (tdl_buffer_line_t *line, FILE *file)
   size_t i = 0;
 
   for (i = 0; i < line->line.length; ++i)
-    _read_point (sbv_get (&line->line, tdl_buffer_point_t, i), file);
+    _read_tchar (sbv_get (&line->line, tdl_char_t, i), file);
 }
 
 static inline void
@@ -171,22 +176,13 @@ tdl_image_load (const char *filename)
 }
 
 static inline void
-_copy_canvas_point (tdl_buffer_point_t *point, tdl_buffer_point_t *imgpoint)
-{
-  u8char_copy (imgpoint->character, point->character);
-  imgpoint->style.color.bg = point->style.color.bg;
-  imgpoint->style.color.fg = point->style.color.fg;
-  imgpoint->style.attributes = point->style.attributes;
-}
-
-static inline void
 _copy_canvas_line (sbslice_t line, tdl_buffer_line_t *imgline)
 {
   size_t i = 0;
   
   for (i = 0; i < line.length; ++i)
-    _copy_canvas_point (sbslice_get (&line, tdl_buffer_point_t, i),
-                        sbv_get (&imgline->line, tdl_buffer_point_t, i));
+    tdl_char_copy(sbv_get (&imgline->line, tdl_char_t, i),
+		  sbslice_get (&line, tdl_char_t, i));
 }
 
 static inline void
@@ -285,16 +281,6 @@ _set_rectangle_diff (tdl_canvas_t *canv, tdl_rectangle_t rect)
 }
 
 static inline void
-_copy_buffer_point (tdl_buffer_point_t *dest, tdl_buffer_point_t *src)
-{
-  u8char_copy(dest->character, src->character);
-  dest->style.attributes = src->style.attributes;
-  dest->style.color.bg = src->style.color.bg;
-  dest->style.color.fg = src->style.color.fg;
-}
-
-
-static inline void
 _copy_line_to_canvas (tdl_buffer_line_t *line, tdl_buffer_line_t *imgline,
                       tdl_point_t pos)
 {
@@ -303,8 +289,8 @@ _copy_line_to_canvas (tdl_buffer_line_t *line, tdl_buffer_line_t *imgline,
   size_t i = 0;
 
   for (i = 0; i < line_slice.length; ++i)
-    _copy_buffer_point (sbslice_get (&line_slice, tdl_buffer_point_t, i),
-                        sbv_get (&imgline->line, tdl_buffer_point_t, i));
+    tdl_char_copy (sbslice_get (&line_slice, tdl_char_t, i),
+		   sbv_get (&imgline->line, tdl_char_t, i));
 }
 
 bool

@@ -17,38 +17,37 @@
  */
 
 #include "tdl/tdl_bufferline.h"
-#include "tdl/tdl_bufferpoint.h"
-#include "tdl/tdl_style.h"
 #include "tdl/tdl_buffer.h"
+#include "tdl/tdl_char.h"
 #include <sbvector.h>
 #include <stdbool.h>
 
 tdl_buffer_line_t
 tdl_buffer_line (size_t width)
 {
-  tdl_buffer_line_t bl = { sbvector (sizeof (tdl_buffer_point_t)), true };
-  tdl_buffer_point_t bpt;
+  tdl_buffer_line_t bl = { sbvector (sizeof (tdl_char_t)), true };
+  tdl_char_t tchar;
   
   if (bl.line.vector)
     {
       sbv_resize (&bl.line, width);
 
-      bpt = tdl_buffer_point (
-          " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
+      tchar =
+	tdl_char (" ", tdl_style (tdl_char_color (256, 256), TDL_NO_ATTRIBUTES));
 
-      sbv_fill (&bl.line, &bpt, bl.line.length);
+      sbv_fill (&bl.line, &tchar, bl.line.length);
     }
 
   return bl;
 }
 
-tdl_buffer_point_t *
+tdl_char_t *
 tdl_buffer_line_get (tdl_buffer_line_t *line, size_t index)
 {  
   if (!line)
     return NULL;
 
-  return sbv_get (&line->line, tdl_buffer_point_t, index);
+  return sbv_get (&line->line, tdl_char_t, index);
 }
 
 bool

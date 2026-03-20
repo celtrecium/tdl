@@ -61,7 +61,7 @@ _tdl_buff_resize_height_up (sbvector_t *vec, tdl_size_t newsize)
     return false;
 
   for (i = vec->length; i < newsize.height; ++i)
-    sbv_set (vec, sbvector_t, i, sbvector (sizeof (tdl_buffer_point_t)));
+    sbv_set (vec, sbvector_t, i, sbvector (sizeof (tdl_char_t)));
   
   return true;
 }
@@ -99,11 +99,11 @@ _tdl_buff_resize_width_up (sbvector_t *vec, tdl_size_t newsize,
                            tdl_size_t prevsize)
 {
   size_t i, j;
-  tdl_buffer_point_t bpt;
+  tdl_char_t tchar;
   sbvector_t *tmpptr;
 
-  bpt = tdl_buffer_point (
-      " ", tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
+  tchar =
+    tdl_char (" ", tdl_style (tdl_char_color (256, 256), TDL_NO_ATTRIBUTES));
 
   for (i = 0; i < vec->length; ++i)
     {
@@ -113,7 +113,7 @@ _tdl_buff_resize_width_up (sbvector_t *vec, tdl_size_t newsize,
         return false;
 
       for (j = prevsize.width; j < newsize.width; ++j)
-        sbv_set (tmpptr, tdl_buffer_point_t, j, bpt);
+        sbv_set (tmpptr, tdl_char_t, j, tchar);
     }
 
   return true;
@@ -221,8 +221,8 @@ tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize)
   return true;
 }
 
-tdl_buffer_point_t *
-tdl_buffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
+tdl_char_t *
+tdl_buffer_get_char (tdl_buffer_t *buff, tdl_point_t point)
 {
   if (!buff)
     return NULL;
@@ -232,8 +232,8 @@ tdl_buffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
       (size_t)point.x);
 }
 
-static inline tdl_buffer_point_t *
-_tdl_sbuffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
+static inline tdl_char_t *
+_tdl_sbuffer_get_char (tdl_buffer_t *buff, tdl_point_t point)
 {
   return tdl_buffer_line_get (
       sbv_get (&buff->sbuff, tdl_buffer_line_t, (size_t)point.y),
@@ -243,16 +243,16 @@ _tdl_sbuffer_get_point (tdl_buffer_t *buff, tdl_point_t point)
 bool
 tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point)
 {
-  tdl_buffer_point_t *fpt = tdl_buffer_get_point (buff, point);
-  tdl_buffer_point_t *spt = _tdl_sbuffer_get_point (buff, point);
+  tdl_char_t *fch = tdl_buffer_get_char (buff, point);
+  tdl_char_t *sch = _tdl_sbuffer_get_char (buff, point);
   
-  return tdl_style_compare (&fpt->style, &spt->style)
-         && u8char_compare (fpt->character, spt->character);
+  return tdl_style_compare (&fch->style, &sch->style)
+         && u8char_compare (fch->ch, sch->ch);
 }
 
 bool
-tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
-                      tdl_buffer_point_t bpt)
+tdl_buffer_set_char (tdl_buffer_t *buff, tdl_point_t point,
+                      tdl_char_t tchar)
 {
   tdl_buffer_line_t *bl;
   
@@ -262,7 +262,7 @@ tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
   bl = sbv_get (&buff->fbuff, tdl_buffer_line_t, (size_t)point.y);
 
   bl->_is_empty = false;
-  *tdl_buffer_line_get (bl, (size_t)point.x) = bpt;
+  *tdl_buffer_line_get (bl, (size_t)point.x) = tchar;
   
   return true;
 }

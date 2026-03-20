@@ -23,9 +23,9 @@
 
 #include <stdlib.h>
 #include <sbvector.h>
-#include "tdl_geometry.h"
-#include "tdl_bufferpoint.h"
-#include "tdl_symbols_export.h"
+#include "tdl/tdl_geometry.h"
+#include "tdl/tdl_symbols_export.h"
+#include "tdl/tdl_char.h"
 
 typedef struct tdl_buffer
 {
@@ -40,11 +40,11 @@ tdl_buffer_t tdl_single_buffer(tdl_size_t size);
 
 bool tdl_buffer_free (tdl_buffer_t *buff);
 bool tdl_buffer_resize (tdl_buffer_t *buff, tdl_size_t newsize);
-tdl_buffer_point_t *tdl_buffer_get_point (tdl_buffer_t *buff,
-                                          tdl_point_t point);
+tdl_char_t *tdl_buffer_get_char (tdl_buffer_t *buff,
+				 tdl_point_t point);
 bool tdl_buffer_fbuff_to_sbuff (tdl_buffer_t *buff);
-bool tdl_buffer_set_point (tdl_buffer_t *buff, tdl_point_t point,
-                           tdl_buffer_point_t bpt);
+bool tdl_buffer_set_char (tdl_buffer_t *buff, tdl_point_t point,
+			  tdl_char_t tchar);
 bool tdl_buffer_check_point_mod (tdl_buffer_t *buff, tdl_point_t point);
 
 sbvector_t _tdl_buff_allocate (tdl_size_t size);

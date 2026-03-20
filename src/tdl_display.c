@@ -30,7 +30,7 @@ _tdl_render_doublebuffered_line (tdl_renderer_t renderer,
 				 tdl_ldiff_t *ldiff)
 {
   size_t i = 0;
-  tdl_buffer_point_t *curr = NULL, *prev = NULL;
+  tdl_char_t *curr = NULL, *prev = NULL;
 
   if (renderer.render_before_line != NULL) {
     renderer.render_before_line((tdl_point_t) {
@@ -41,7 +41,7 @@ _tdl_render_doublebuffered_line (tdl_renderer_t renderer,
 
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
-      curr = sbv_get (line, tdl_buffer_point_t, i);
+      curr = sbv_get (line, tdl_char_t, i);
       
       if (!curr)
         return false;
@@ -118,7 +118,7 @@ _tdl_render_singlebuffered_line (tdl_renderer_t renderer,
     };
   
   size_t i = 0;
-  tdl_buffer_point_t *curr = NULL;
+  tdl_char_t *curr = NULL;
 
   if (renderer.render_before_line != NULL) {
     renderer.render_before_line((tdl_point_t) {
@@ -129,7 +129,7 @@ _tdl_render_singlebuffered_line (tdl_renderer_t renderer,
 
   for (i = 0; i < line->length; ++i)
     {
-      curr = sbv_get (line, tdl_buffer_point_t, i);
+      curr = sbv_get (line, tdl_char_t, i);
       
       if (!curr)
         return false;

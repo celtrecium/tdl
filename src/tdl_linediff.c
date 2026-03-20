@@ -57,8 +57,8 @@ _tdl_clarify_first_modified (tdl_ldiff_t *ldiff, tdl_buffer_line_t **buff_lines)
 
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
-      if (!tdl_buffpt_compare(tdl_buffer_line_get (buff_lines[0], i),
-                              tdl_buffer_line_get (buff_lines[1], i)))
+      if (!tdl_char_compare (tdl_buffer_line_get (buff_lines[0], i),
+			     tdl_buffer_line_get (buff_lines[1], i)))
         break;
     }
 
@@ -73,8 +73,8 @@ _tdl_clarify_last_modified (tdl_ldiff_t *ldiff, tdl_buffer_line_t **buff_lines)
 
   for (i = ldiff->first_modified; i <= ldiff->last_modified; ++i)
     {
-      if (!tdl_buffpt_compare(tdl_buffer_line_get (buff_lines[0], i),
-                              tdl_buffer_line_get (buff_lines[1], i)))
+      if (!tdl_char_compare (tdl_buffer_line_get (buff_lines[0], i),
+			     tdl_buffer_line_get (buff_lines[1], i)))
         last = i;
     }
 

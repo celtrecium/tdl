@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 #include "tdl/tdl_symbols_export.h"
-#include "tdl/tdl_bufferpoint.h"
+#include "tdl/tdl_char.h"
 
 typedef struct tdl_renderer_signals
 {
@@ -31,7 +31,7 @@ typedef struct tdl_renderer_signals
 } tdl_renderer_signals_t;
 
 TDL_API tdl_renderer_signals_t tdl_renderer_signals (void);    
-TDL_API tdl_renderer_signals_t tdl_get_renderer_signals (tdl_buffer_point_t *curr,
-							 tdl_buffer_point_t *prev);
+TDL_API tdl_renderer_signals_t tdl_get_renderer_signals (tdl_char_t *curr,
+							 tdl_char_t *prev);
 
 #endif /* TDL_RENDERER_SIGNALS_H */
