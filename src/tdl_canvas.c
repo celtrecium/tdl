@@ -22,6 +22,8 @@
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_terminal.h"
 
+#define TAB_SIZE 8
+
 tdl_canvas_t *
 tdl_canvas_with (tdl_size_t size, tdl_buffer_type_t buffer_type)
 {
@@ -101,20 +103,20 @@ tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
 
   switch (ch.ch[0]) {
   case '\n':
-      ++cur.y;
-      tdl_set_cursor_pos (canv, cur);
+    ++cur.y;
+    tdl_set_cursor_pos (canv, cur);
 
-      return;
+    return;
   case '\r':
-      cur.x = 0;
-      tdl_set_cursor_pos (canv, cur);
+    cur.x = 0;
+    tdl_set_cursor_pos (canv, cur);
 
-      return;
+    return;
   case '\t':
-      cur.x += 8;             /* Tab character size */
-      tdl_set_cursor_pos (canv, cur);
+    cur.x = (cur.x / TAB_SIZE + 1) * TAB_SIZE; 
+    tdl_set_cursor_pos (canv, cur);
 
-      return;
+    return;
   case '\b':
     --cur.x;
     tdl_set_cursor_pos (canv, cur);
