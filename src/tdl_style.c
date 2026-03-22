@@ -70,19 +70,21 @@ tdl_style (tdl_char_color_t color, tdl_attributes_t attrs)
 bool
 tdl_style_compare (tdl_style_t *first, tdl_style_t *second)
 {
-  if (!first && !second)
-    return true;
-  else if (!first || !second)
-    return false;
+  bool is_both_bg_rgb = first->color.bg == TDL_RGB_COLOR
+    && second->color.bg == TDL_RGB_COLOR;
 
-  bool a1 = first->color.bg == TDL_RGB_COLOR && second->color.bg == TDL_RGB_COLOR;
-  bool a2 = a1 && (tdl_rgb_compare(first->color.bg_rgb, second->color.bg_rgb));
-  bool a3 = first->color.fg == TDL_RGB_COLOR && second->color.fg == TDL_RGB_COLOR;
-  bool a4 = a3 && (tdl_rgb_compare(first->color.fg_rgb, second->color.fg_rgb));
+  bool is_both_bg_rgb_equal = is_both_bg_rgb
+    && (tdl_rgb_compare(first->color.bg_rgb, second->color.bg_rgb));
+
+  bool is_both_fg_rgb = first->color.fg == TDL_RGB_COLOR
+    && second->color.fg == TDL_RGB_COLOR;
+
+  bool is_both_fg_rgb_equal = is_both_fg_rgb
+    && (tdl_rgb_compare(first->color.fg_rgb, second->color.fg_rgb));
   
   return first->attributes == second->attributes
-    && ((first->color.bg == second->color.bg) || a2)
-    && ((first->color.fg == second->color.fg) || a4);
+    && (is_both_bg_rgb_equal || (first->color.bg == second->color.bg))
+    && (is_both_fg_rgb_equal || (first->color.fg == second->color.fg));
 }
 
 tdl_rgb_t

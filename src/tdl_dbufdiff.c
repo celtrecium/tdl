@@ -56,16 +56,13 @@ tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff)
   _header_t *header, *tmp;
   size_t i;
 
-  if (dbdiff == NULL || *dbdiff == NULL)
-    return false;
-
   header = HEADER(*dbdiff);
 
   for (i = 0; i < header->count; ++i)
     {
       if ((*dbdiff)[i].row_number == rdiff.row_number)
 	{
-	  tdl_rowdiff_combine(&(*dbdiff)[i], rdiff);
+	  tdl_rowdiff_combine (&((*dbdiff)[i]), rdiff);
 
 	  return true;
 	}

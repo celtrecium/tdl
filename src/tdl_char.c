@@ -19,6 +19,7 @@
 #include <string.h>
 #include <u8string.h>
 #include "tdl/tdl_char.h"
+#include "tdl/tdl_style.h"
 
 tdl_char_t
 tdl_char (u8char_t uchar, tdl_style_t style)
@@ -45,11 +46,6 @@ tdl_char_copy (tdl_char_t *dest, tdl_char_t *src)
 bool
 tdl_char_compare (tdl_char_t *first, tdl_char_t *second)
 {
-  if (!first || !second)
-    return first == second;
-
-  return u8char_compare(first, second) &&
-    first->style.attributes == second->style.attributes &&
-    first->style.color.bg == second->style.color.bg &&
-    first->style.color.fg == second->style.color.fg;
+  return u8char_compare (first->ch, second->ch)
+    && tdl_style_compare (&(first->style), &(second->style));
 }

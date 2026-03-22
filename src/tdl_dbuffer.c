@@ -65,8 +65,8 @@ tdl_dbuffer_resize (tdl_dbuffer_t *dbuff, tdl_size_t newsize)
 bool
 tdl_dbuffer_is_char_mod (tdl_dbuffer_t *dbuff, tdl_point_t point)
 {
-  return tdl_char_compare(&dbuff->main[point.y][point.x],
-			  &dbuff->shadow[point.y][point.x]);
+  return !tdl_char_compare (&(dbuff->main[point.y][point.x]),
+			    &(dbuff->shadow[point.y][point.x]));
 }
 
 void
