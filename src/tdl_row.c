@@ -136,7 +136,7 @@ tdl_row_copy (tdl_row_t *dest, tdl_row_t *src)
 
   dest_h->is_clear = src_h->is_clear;
 
-  for (i = 0; src_h->count; ++i)
+  for (i = 0; i < src_h->count; ++i)
     (*dest)[i] = (*src)[i];
   
   return true;
