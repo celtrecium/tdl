@@ -63,9 +63,6 @@ tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
   _header_t *tmp = NULL;
   size_t newcapacity, i;
   
-  if (buffer == NULL)
-    return false;
-
   header = HEADER (*buffer);
 
   if (header->count == newsize.height)
@@ -120,9 +117,6 @@ tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src)
   tdl_size_t src_size;
   size_t i;
   
-  if (dest == NULL || src == NULL || *dest == NULL || *src == NULL)
-    return false;
-
   src_size = HEADER(*src)->size;
   
   if (!tdl_buffer_resize (dest, src_size))
@@ -135,57 +129,36 @@ tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src)
   return true;
 }
 
-bool
+void
 tdl_buffer_free (tdl_buffer_t buffer)
 {
   size_t i;
-  _header_t *header;
-
-  if (buffer == NULL)
-    return false;
-
-  header = HEADER (buffer);
+  _header_t *header = HEADER (buffer);
 
   for (i = 0; i < header->count; ++i) 
-    if (!tdl_row_free (buffer[i]))
-      return false;
+    tdl_row_free (buffer[i]);
 
   free (header);
-  
-  return true;
 }
 
-bool
+void
 tdl_buffer_clear_row (tdl_buffer_t buff, size_t row_n)
 {
-  size_t i, w;
+  size_t i;
+  size_t w = tdl_row_size (buff[row_n]);
   tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
-  
-  if (buff == NULL)
-    return false;
 
   tdl_row_set_clear(buff[row_n], true);
 
-  w = tdl_row_size (buff[row_n]);
-
   for (i = 0; i < w; ++i)
     buff[row_n][i] = empty_char;
-  
-  return true;
 }
 
-bool
+void
 tdl_buffer_clear (tdl_buffer_t buff)
 {
-  size_t h, i;
-  
-  if (buff == NULL)
-    return false;
-
-  h = HEADER(buff)->count;
+  size_t i, h = HEADER(buff)->count;
 
   for (i = 0; i < h; ++i)
     tdl_buffer_clear_row (buff, i);
-  
-  return true;
 }

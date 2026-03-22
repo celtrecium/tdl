@@ -35,16 +35,11 @@ tdl_char (u8char_t uchar, tdl_style_t style)
   return tchar;
 }
 
-bool
+void
 tdl_char_copy (tdl_char_t *dest, tdl_char_t *src)
 {
-  if (!dest || !src)
-    return false;
-
   u8char_copy (dest->ch, src->ch);
   dest->style = src->style;
-
-  return true;
 }
 
 bool

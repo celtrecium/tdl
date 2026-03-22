@@ -31,7 +31,7 @@ typedef struct tdl_rowdiff
 } tdl_rowdiff_t;
 
 tdl_rowdiff_t tdl_rowdiff (size_t row_n, size_t first, size_t last);
-bool tdl_rowdiff_set (tdl_rowdiff_t *rdiff, size_t modified);
-bool tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff);
+void tdl_rowdiff_set (tdl_rowdiff_t *rdiff, size_t modified);
+void tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff);
 
 #endif  /* TDL_ROWDIFF_H */

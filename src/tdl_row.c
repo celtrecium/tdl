@@ -36,21 +36,15 @@ tdl_row_size (tdl_row_t row)
   return HEADER(row)->count;
 }
 
-bool
+void
 tdl_row_set_clear (tdl_row_t row, bool is_empty)
 {
-  if (row == NULL)
-    return false;
-
   HEADER(row)->is_clear = is_empty;
-
-  return true;
 }
 
-bool tdl_row_is_clear (tdl_row_t row) {
-  if (row == NULL)
-    return true;
-
+bool
+tdl_row_is_clear(tdl_row_t row)
+{
   return HEADER(row)->is_clear;
 }
 
@@ -73,15 +67,10 @@ tdl_row (size_t width)
   return row;
 }
 
-bool
+void
 tdl_row_free (tdl_row_t row)
 {
-  if (!row)
-    return false;
-
   free (HEADER (row));
-  
-  return true;
 }
 
 bool

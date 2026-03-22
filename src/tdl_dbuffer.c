@@ -34,24 +34,14 @@ tdl_dbuffer (tdl_size_t size)
     };
 }
 
-bool
+void
 tdl_dbuffer_free (tdl_dbuffer_t *dbuff)
 {
-  if (dbuff == NULL)
-    return false;
-
-  if (!tdl_buffer_free (dbuff->main))
-    return false;
-
-  if (!tdl_buffer_free (dbuff->shadow))
-    return false;
-
-  if (!tdl_dbufdiff_free(dbuff->diff))
-    return false;
+  tdl_buffer_free (dbuff->main);
+  tdl_buffer_free (dbuff->shadow);
+  tdl_dbufdiff_free(dbuff->diff);
 
   dbuff->size = (tdl_size_t) { 0, 0 };
-  
-  return true;
 }
 
 bool
@@ -78,13 +68,10 @@ tdl_dbuffer_is_char_mod (tdl_dbuffer_t *dbuff, tdl_point_t point)
 			  &dbuff->shadow[point.y][point.x]);
 }
 
-bool
+void
 tdl_dbuffer_set_char (tdl_dbuffer_t *dbuff, tdl_point_t point,
                       tdl_char_t tchar)
 {
-  if (dbuff == NULL)
-    return false;
-
   tdl_row_set_clear (dbuff->main[point.y], false);
 
   dbuff->main[point.y][point.x] = tchar;
@@ -95,32 +82,22 @@ tdl_dbuffer_set_char (tdl_dbuffer_t *dbuff, tdl_point_t point,
 	.first_modified = (size_t) point.x,
 	.last_modified = (size_t) point.x
       });
-  
-  return true;
 }
 
-bool
+void
 tdl_dbuffer_throw_shadow (tdl_dbuffer_t *dbuff)
 {
-  if (dbuff == NULL)
-    return false;
-
   tdl_buffer_copy (&dbuff->shadow, &dbuff->main);
-
-  return true;
 }
 
-bool
+void
 tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
 {
-  size_t i, w;
   tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
-
-  if (dbuff == NULL)
-    return false;
+  size_t i;
+  size_t w = tdl_row_size (dbuff->main[row_n]);
 
   tdl_row_set_clear (dbuff->main[row_n], true);
-  w = tdl_row_size (dbuff->main[row_n]);
   
   for (i = 0; i < w; ++i)
     dbuff->main[row_n][i] = empty_char;
@@ -130,21 +107,13 @@ tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
       .first_modified = 0,
       .last_modified = w
     });
-  
-  return true;
 }
 
-bool
+void
 tdl_dbuffer_clear (tdl_dbuffer_t *dbuff)
 {
   size_t i;
 
-  
-  if (dbuff == NULL)
-    return false;
-
   for (i = 0; i < dbuff->size.height; ++i)
     tdl_dbuffer_clear_row (dbuff, i);
-  
-  return true;
 }

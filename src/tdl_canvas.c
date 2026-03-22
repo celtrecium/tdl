@@ -72,15 +72,10 @@ tdl_destroy_canvas (tdl_canvas_t *canv)
 }
 
 /* 2. Canvas setters */
-bool
+void
 tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
 {
-  if (!canv)
-    return false;
-
   canv->cursor = tdl_point_in_bounds (pos, canv->size);
-
-  return true;
 }
 
 inline static void
@@ -99,54 +94,49 @@ _tdl_putchar(tdl_canvas_t *canv, tdl_char_t ch)
     }
 }
 
-bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
+void
+tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
 {
-  tdl_point_t cur;
-  cur = canv->cursor;
+  tdl_point_t cur = canv->cursor;
 
   switch (ch.ch[0]) {
   case '\n':
       ++cur.y;
       tdl_set_cursor_pos (canv, cur);
 
-      return true;
+      return;
   case '\r':
       cur.x = 0;
       tdl_set_cursor_pos (canv, cur);
 
-      return true;
+      return;
   case '\t':
       cur.x += 8;             /* Tab character size */
       tdl_set_cursor_pos (canv, cur);
 
-      return true;
+      return;
   case '\b':
     --cur.x;
     tdl_set_cursor_pos (canv, cur);
     _tdl_putchar (canv, tdl_char (" ", ch.style));
     
-    return true;
+    return;
   case '\a':
-    return true;
+    return;
   }
 
   _tdl_putchar (canv, ch);
   ++cur.x;
   tdl_set_cursor_pos (canv, cur);
-
-  return true;
 }
 
-bool
+void
 tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
   char *offset_ptr = NULL;
   u8char_t ch_buff;
   
-  if (!canv)
-    return false;
-
   offset_ptr = text.string;
   
   for (i = 0; i < u8str_strlen(text.string); ++i)
@@ -154,16 +144,11 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
       offset_ptr = u8string_next_char(offset_ptr, &ch_buff);
       tdl_putchar(canv, tdl_char (ch_buff, text.style));
     }
-  
-  return true;
 }
 
-bool
+void
 tdl_clear (tdl_canvas_t *canv)
 {
-  if (canv == NULL)
-    return false;
-
   switch (canv->buffer.type)
     {
     case TDL_DOUBLE_BUFFER:
@@ -173,6 +158,4 @@ tdl_clear (tdl_canvas_t *canv)
       tdl_buffer_clear (canv->buffer.as.single_buffer);
       break;
     }
-
-  return true;
 }

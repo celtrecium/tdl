@@ -156,25 +156,23 @@ _tdl_display_render_singlebuffered (tdl_canvas_t *canv, tdl_renderer_t renderer)
   return true;
 }
 
-bool
+void
 tdl_display_with_renderer (tdl_canvas_t *canv, tdl_renderer_t renderer)
 {
   switch (canv->buffer.type)
     {
     case TDL_DOUBLE_BUFFER:
-      return _tdl_display_render_doublebuffered (canv, renderer);
+      _tdl_display_render_doublebuffered (canv, renderer);
+      break;
     case TDL_SINGLE_BUFFER:
-      return _tdl_display_render_singlebuffered (canv, renderer);
+      _tdl_display_render_singlebuffered (canv, renderer);
+      break;
     }
-
-  return false;
 }
 
-bool
+void
 tdl_display (tdl_canvas_t *canv)
 {
   tdl_display_with_renderer (canv, tdl_default_renderer);
   fflush (stdout);
-  
-  return true;
 }

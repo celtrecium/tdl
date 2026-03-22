@@ -30,7 +30,7 @@ typedef struct tdl_char
 } tdl_char_t;
 
 TDL_API tdl_char_t tdl_char (u8char_t uchar, tdl_style_t style);
-TDL_API bool tdl_char_copy (tdl_char_t *dest, tdl_char_t *src);
+TDL_API void tdl_char_copy (tdl_char_t *dest, tdl_char_t *src);
 TDL_API bool tdl_char_compare (tdl_char_t *first, tdl_char_t *second);
 
 #endif  /* TDL_CHAR_H */

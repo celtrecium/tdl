@@ -34,28 +34,18 @@ tdl_rowdiff (size_t row_n, size_t first_m, size_t last_m)
   return bsdiff;
 }
 
-bool
+void
 tdl_rowdiff_set (tdl_rowdiff_t *bsdiff, size_t modified)
 {
-  if (bsdiff == NULL)
-    return false;
-
   if (modified > bsdiff->last_modified)
     bsdiff->last_modified = modified;
   else if (modified < bsdiff->first_modified)
     bsdiff->first_modified = modified;
-
-  return true;
 }
 
-bool
+void
 tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff)
 {
-  if (dest == NULL || dest->row_number != rdiff.row_number)
-    return false;
-
   dest->first_modified = MIX (dest->first_modified, rdiff.first_modified);
   dest->last_modified = MAX (dest->last_modified, rdiff.last_modified);
-  
-  return true;
 }

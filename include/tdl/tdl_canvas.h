@@ -53,10 +53,10 @@ TDL_API tdl_canvas_t *tdl_canvas_with (tdl_size_t size,
 TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
-TDL_API bool tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
+TDL_API void tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
 TDL_API bool tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize);
-TDL_API bool tdl_print (tdl_canvas_t *canv, tdl_text_t text);
-TDL_API bool tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
-TDL_API bool tdl_clear (tdl_canvas_t *canv);
+TDL_API void tdl_print (tdl_canvas_t *canv, tdl_text_t text);
+TDL_API void tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
+TDL_API void tdl_clear (tdl_canvas_t *canv);
 
 #endif /* TDL_CANVAS_H */

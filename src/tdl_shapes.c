@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 /* 1.1. Functions for drawing shapes */
-bool
+void
 tdl_draw_line (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t line)
 {
   const int deltaX = abs(line.b.x - line.a.x);
@@ -35,12 +35,7 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t line)
   int error = deltaX - deltaY;
   int error2;
 
-  tdl_point_t tmp_cur;
-  
-  if (canv == NULL)
-    return false;
-  
-  tmp_cur = canv->cursor;
+  tdl_point_t tmp_cur = canv->cursor;
   
   while (line.a.x != line.b.x || line.a.y != line.b.y)
     {
@@ -63,26 +58,19 @@ tdl_draw_line (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t line)
     }
 
   tdl_set_cursor_pos (canv, tmp_cur);
-  
-  return true;
 }
 
-bool
+void
 tdl_draw_lines (tdl_canvas_t *canv, tdl_char_t ch, tdl_line_t *lines,
                 size_t n)
 {
-  size_t i = 0;
+  size_t i;
   
-  if (canv == NULL)
-    return false;
-
   for (i = 0; i < n; ++i)
     tdl_draw_line (canv, ch, lines[i]);
-
-  return true;
 }
 
-bool
+void
 tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch, tdl_rectangle_t rect)
 {
   tdl_point_t end = {
@@ -97,24 +85,16 @@ tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch, tdl_rectangle_t rect)
     tdl_line (tdl_point (rect.point.x, end.y), end)
   };
 
-  if (canv == NULL)
-    return false;
-
   tdl_draw_lines (canv, ch, lines, 4);
-
-  return true;
 }
 
-bool
+void
 tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
                            tdl_rectangle_t rect)
 {
-  size_t i = 0;
-  size_t j = 0;
+  size_t i;
+  size_t j;
   
-  if (canv == NULL)
-    return false;
-
   for (i = 0; i < rect.size.width; ++i)
     {
       for (j = 0; j < rect.size.height; ++j)
@@ -125,37 +105,25 @@ tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
           tdl_putchar (canv, ch);
         }
     }
-
-  return true;
 }
 
 /* 1.2. Functions for drawing an array of shapes */
-bool
+void
 tdl_draw_rectangles (tdl_canvas_t *canv, tdl_char_t ch,
                      tdl_rectangle_t *rects, size_t n)
 {
-  size_t i = 0;
-  
-  if (canv == NULL)
-    return false;
+  size_t i;
 
   for (i = 0; i < n; ++i)
     tdl_draw_rectangle (canv, ch, rects[i]);
-
-  return true;
 }
 
-bool
+void
 tdl_draw_filled_rectangles (tdl_canvas_t *canv, tdl_char_t ch,
                             tdl_rectangle_t *rects, size_t n)
 {
   size_t i = 0;
   
-  if (canv == NULL)
-    return false;
-
   for (i = 0; i < n; ++i)
     tdl_draw_filled_rectangle (canv, ch, rects[i]);
-
-  return true;
 }

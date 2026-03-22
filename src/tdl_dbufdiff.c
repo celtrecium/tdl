@@ -87,24 +87,14 @@ tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff)
   return true;
 }
 
-bool
+void
 tdl_dbufdiff_clear (tdl_dbufdiff_t dbdiff)
 {
-  if (dbdiff == NULL)
-    return false;
-
   HEADER(dbdiff)->count = 0;
-  
-  return true;
 }
 
-bool
+void
 tdl_dbufdiff_free (tdl_dbufdiff_t dbdiff)
 {
-  if (dbdiff == NULL)
-    return false;
-
   free (HEADER(dbdiff));
-  
-  return true;
 }

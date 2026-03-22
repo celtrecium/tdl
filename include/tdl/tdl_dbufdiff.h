@@ -25,8 +25,8 @@ typedef tdl_rowdiff_t *tdl_dbufdiff_t;
 
 tdl_dbufdiff_t tdl_dbufdiff (void);
 bool tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff);
-bool tdl_dbufdiff_clear (tdl_dbufdiff_t dbdiff);
+void tdl_dbufdiff_clear (tdl_dbufdiff_t dbdiff);
 size_t tdl_dbufdiff_size (tdl_dbufdiff_t dbdiff);
-bool tdl_dbufdiff_free (tdl_dbufdiff_t dbdiff);
+void tdl_dbufdiff_free (tdl_dbufdiff_t dbdiff);
 
 #endif /* TDL_DBUFDIFF_H */

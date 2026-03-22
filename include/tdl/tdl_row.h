@@ -29,9 +29,9 @@ tdl_row_t tdl_row (size_t width);
 
 size_t tdl_row_size (tdl_row_t bufstr);
 bool tdl_row_resize (tdl_row_t *bufstr, size_t newsize);
-bool tdl_row_set_clear (tdl_row_t bufstr, bool is_clear);
+void tdl_row_set_clear (tdl_row_t bufstr, bool is_clear);
 bool tdl_row_is_clear (tdl_row_t bufstr);
-bool tdl_row_free (tdl_row_t bufstr);
+void tdl_row_free (tdl_row_t bufstr);
 bool tdl_row_copy (tdl_row_t *dest, tdl_row_t *src);
 
 #endif /* TDL_ROW_H */
