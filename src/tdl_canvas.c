@@ -161,3 +161,90 @@ tdl_clear (tdl_canvas_t *canv)
       break;
     }
 }
+
+tdl_buffer_t
+_get_main_buffer (tdl_canvas_t *canv)
+{
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      return canv->buffer.as.single_buffer;
+    case TDL_DOUBLE_BUFFER:
+      return canv->buffer.as.double_buffer.main;
+    }
+
+  return NULL;
+}
+
+void
+_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur, size_t n_rows)
+{
+  size_t i, j;
+  tdl_row_t emptyrow;
+
+  for (i = 0; i < n_rows; ++i)
+    tdl_row_clear (buff[i]);
+
+  for (i = 0; i < n_rows; ++i)
+    {
+      emptyrow = buff[0];
+
+      for (j = 1; j <= (size_t) cur.y; ++j)
+	buff[j - 1] = buff[j];
+
+      buff[cur.y] = emptyrow;
+    }
+}
+
+void
+_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur, size_t n_rows)
+{
+  size_t i, j;
+  tdl_row_t emptyrow;
+  size_t height = tdl_buffer_size (&buff).height;
+
+  for (i = 0; i < n_rows; ++i)
+    tdl_row_clear (buff[height-1 - i]);
+
+  for (i = 0; i < n_rows; ++i)
+    {
+      emptyrow = buff[height-1];
+
+      for (j = height-2; j >= (size_t) cur.y; --j)
+	buff[j + 1] = buff[j];
+
+      buff[cur.y] = emptyrow;
+    }
+}
+
+void
+tdl_insert_rows_up (tdl_canvas_t *canv, size_t n_rows)
+{
+  tdl_buffer_t buff = _get_main_buffer (canv);
+
+  _insert_rows_up (buff, canv->cursor, n_rows);
+}
+
+void
+tdl_insert_rows_down (tdl_canvas_t *canv, size_t n_rows)
+{
+  tdl_buffer_t buff = _get_main_buffer (canv);
+
+  _insert_rows_down (buff, canv->cursor, n_rows);
+}
+
+void
+tdl_scroll_up (tdl_canvas_t *canv, size_t n_rows)
+{
+  tdl_buffer_t buff = _get_main_buffer (canv);
+
+  _insert_rows_down (buff, tdl_point (0, (int) canv->size.height-1), n_rows);
+}
+
+void
+tdl_scroll_down (tdl_canvas_t *canv, size_t n_rows)
+{
+  tdl_buffer_t buff = _get_main_buffer (canv);
+
+  _insert_rows_up (buff, tdl_point (0, 0), n_rows);
+}

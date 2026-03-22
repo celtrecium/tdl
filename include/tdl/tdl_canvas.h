@@ -58,5 +58,9 @@ TDL_API bool tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize);
 TDL_API void tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 TDL_API void tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
 TDL_API void tdl_clear (tdl_canvas_t *canv);
+TDL_API void tdl_scroll_up (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_scroll_down (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_insert_rows_up (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_insert_rows_down (tdl_canvas_t *canv, size_t n_rows);
 
 #endif /* TDL_CANVAS_H */
