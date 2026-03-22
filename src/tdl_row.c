@@ -42,6 +42,19 @@ tdl_row_set_clear (tdl_row_t row, bool is_empty)
   HEADER(row)->is_clear = is_empty;
 }
 
+void
+tdl_row_clear (tdl_row_t row)
+{
+  size_t i;
+  size_t w = HEADER(row)->count;
+  tdl_char_t tchar = tdl_char (" ", tdl_default_style);
+  
+  HEADER(row)->is_clear = true;
+
+  for (i = 0; i < w; ++i)
+    row[i] = tchar;
+}
+
 bool
 tdl_row_is_clear(tdl_row_t row)
 {
@@ -60,9 +73,8 @@ tdl_row (size_t width)
   *head = header;
   row = DATA (head);
 
-  for (i = 0; i < header.count; ++i) {
+  for (i = 0; i < header.count; ++i)
     row[i] = tchar;
-  }
 
   return row;
 }
