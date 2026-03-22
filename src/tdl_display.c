@@ -73,7 +73,9 @@ _tdl_display_render_doublebuffered (tdl_canvas_t *canv, tdl_renderer_t renderer)
   
   if(diffs_count == 0)
     return true;
- 
+
+  tdl_dbuffer_clarify_diff (&canv->buffer.as.double_buffer);
+  
   for (i = 0; i < diffs_count; ++i)
     {
       rowdiff = canv->buffer.as.double_buffer.diff[i];

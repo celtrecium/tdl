@@ -18,6 +18,7 @@
 
 #include "tdl/tdl_dbuffer.h"
 #include "tdl/tdl_dbufdiff.h"
+#include "tdl/tdl_geometry.h"
 #include "tdl/tdl_row.h"
 #include "tdl/tdl_rowdiff.h"
 #include "tdl/tdl_style.h"
@@ -116,4 +117,59 @@ tdl_dbuffer_clear (tdl_dbuffer_t *dbuff)
 
   for (i = 0; i < dbuff->size.height; ++i)
     tdl_dbuffer_clear_row (dbuff, i);
+}
+
+static tdl_rowdiff_t
+_clarify_rdiff_first (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+{
+  size_t i;
+  tdl_point_t curr_pt;
+
+  for (i = rowdiff.first_modified; i <= rowdiff.last_modified; ++i)
+    {
+      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) rowdiff.row_number };
+
+      if (tdl_dbuffer_is_char_mod (dbuff, curr_pt))
+	break;
+    }
+
+  rowdiff.first_modified = i;
+
+  return rowdiff;
+}
+
+static tdl_rowdiff_t
+_clarify_rdiff_last (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+{
+  size_t i;
+  tdl_point_t curr_pt;
+
+  for (i = rowdiff.last_modified; i >= rowdiff.first_modified; --i)
+    {
+      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) rowdiff.row_number };
+
+      if (tdl_dbuffer_is_char_mod (dbuff, curr_pt))
+	break;
+    }
+
+  rowdiff.last_modified = i;
+
+  return rowdiff;
+}
+
+static tdl_rowdiff_t
+_clarify_rowdiff (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+{
+  return _clarify_rdiff_last(dbuff, _clarify_rdiff_first (dbuff, rowdiff));
+}
+
+void
+tdl_dbuffer_clarify_diff (tdl_dbuffer_t *dbuff)
+{
+  size_t i;
+  size_t diffs_count = tdl_dbufdiff_size (dbuff->diff);
+  
+  for (i = 0; i < diffs_count; ++i) {
+    dbuff->diff[i] = _clarify_rowdiff (dbuff, dbuff->diff[i]);
+  }
 }

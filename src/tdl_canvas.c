@@ -78,7 +78,7 @@ tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
   canv->cursor = tdl_point_in_bounds (pos, canv->size);
 }
 
-inline static void
+static void
 _tdl_putchar(tdl_canvas_t *canv, tdl_char_t ch)
 {
   switch (canv->buffer.type)
