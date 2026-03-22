@@ -123,7 +123,7 @@ tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src)
     return false;
 
   for (i = 0; i < src_size.height; ++i)
-    if(!tdl_row_copy (&(*dest[i]), &(*src[i])))
+    if(!tdl_row_copy (&((*dest)[i]), &((*src)[i])))
       return false;
   
   return true;

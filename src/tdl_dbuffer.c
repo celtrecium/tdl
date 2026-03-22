@@ -88,7 +88,7 @@ tdl_dbuffer_set_char (tdl_dbuffer_t *dbuff, tdl_point_t point,
 void
 tdl_dbuffer_throw_shadow (tdl_dbuffer_t *dbuff)
 {
-  tdl_buffer_copy (&dbuff->shadow, &dbuff->main);
+  tdl_buffer_copy (&(dbuff->shadow), &(dbuff->main));
 }
 
 void
