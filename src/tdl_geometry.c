@@ -52,12 +52,4 @@ tdl_point_in_bounds (tdl_point_t point, tdl_size_t bounds)
     .x = (int) (v1d % bounds.width),
     .y = (int) ((v1d / bounds.width) % bounds.height)
   };
-
-  /*
-  return (tdl_point_t)
-    {
-      .x = point.x % (int) bounds.width,
-      .y = point.y % (int) bounds.height
-    };
-  */
 }
