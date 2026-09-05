@@ -19,6 +19,7 @@
 #ifndef TDL_CANVAS_H
 #define TDL_CANVAS_H
 
+#include "tdl/tdl_scroll_reg.h"
 #include "tdl_symbols_export.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_dbuffer.h"
@@ -33,6 +34,7 @@ typedef struct tdl_canvas
 {
   tdl_point_t cursor;
   tdl_size_t size;
+  tdl_scroll_reg_t scrolling_region;
 
   struct {
     tdl_buffer_type_t type;
@@ -54,13 +56,14 @@ TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
 TDL_API void tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
+TDL_API void tdl_set_scrolling_region (tdl_canvas_t *canv, tdl_scroll_reg_t sr);
 TDL_API bool tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize);
 TDL_API void tdl_print (tdl_canvas_t *canv, tdl_text_t text);
 TDL_API void tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch);
 TDL_API void tdl_clear (tdl_canvas_t *canv);
 TDL_API void tdl_scroll_up (tdl_canvas_t *canv, size_t n_rows);
 TDL_API void tdl_scroll_down (tdl_canvas_t *canv, size_t n_rows);
-TDL_API void tdl_insert_rows_up (tdl_canvas_t *canv, size_t n_rows);
-TDL_API void tdl_insert_rows_down (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_insert_rows (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_delete_rows (tdl_canvas_t *canv, size_t n_rows);
 
 #endif /* TDL_CANVAS_H */
