@@ -65,7 +65,8 @@ tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
   
   header = HEADER (*buffer);
 
-  if (header->count == newsize.height)
+  if (header->size.height == newsize.height
+      && header->size.width == newsize.width)
     return true;
 
   newcapacity = header->capacity * 2;
@@ -73,11 +74,11 @@ tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
   if (header->count >= newsize.height)
     {
       for (i = 0; i < newsize.height; ++i)
-	if (!tdl_row_resize (&(*buffer[i]), newsize.width))
+	if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
 	  return false;
 
       for (i = newsize.height; i < header->count; ++i)
-	tdl_row_free (*buffer[i]);
+	tdl_row_free ((*buffer)[i]);
     }
   else
     {
@@ -98,11 +99,11 @@ tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
 	}
 
       for (i = 0; i < header->count; ++i)
-	if (!tdl_row_resize (&(*buffer[i]), newsize.width))
+	if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
 	  return false;
 
       for (i = header->count; i < newsize.height; ++i)
-	*buffer[i] = tdl_row (newsize.width);
+	(*buffer)[i] = tdl_row (newsize.width);
     }
 
   header->count = newsize.height;

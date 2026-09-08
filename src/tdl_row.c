@@ -91,7 +91,7 @@ tdl_row_resize (tdl_row_t *row, size_t newsize)
   _header_t *header = NULL;
   _header_t *tmp = NULL;
   tdl_char_t tchar;
-  size_t newcapacity, i;
+  size_t newcapacity, i, prevcount;
   
   if (row == NULL)
     return false;
@@ -102,6 +102,7 @@ tdl_row_resize (tdl_row_t *row, size_t newsize)
     return true;
 
   newcapacity = header->capacity * 2;
+  prevcount = header->count;
 
   if (header->capacity >= newsize)
     {
@@ -121,13 +122,14 @@ tdl_row_resize (tdl_row_t *row, size_t newsize)
       tmp->count = newsize;
       
       *row = DATA (tmp);
+      header = HEADER (*row);
     }
 
-  if (newsize > header->count)
+  if (newsize > prevcount)
     {
       tchar = tdl_char (" ", tdl_default_style);
 
-      for (i = header->count; i < newsize; ++i)
+      for (i = prevcount; i < newsize; ++i)
 	(*row)[i] = tchar;
     }
   

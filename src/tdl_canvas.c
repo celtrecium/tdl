@@ -118,7 +118,7 @@ tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   switch (ch.ch[0]) {
   case '\n':
     if ((cur.y == (int)(canv->scrolling_region.bottom))
-	|| (cur.y >= (int)(canv->size.height-1)))
+	|| (cur.y >= (int)(canv->size.height)))
       tdl_scroll_down (canv, 1);
     else
       ++canv->cursor.y;
@@ -188,17 +188,25 @@ tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize)
       canv->size.height == newsize.height)
     return true;
 
-  switch (canv->buffer.type) {
-  case TDL_SINGLE_BUFFER:
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
       tdl_buffer_resize (&canv->buffer.as.single_buffer, newsize);
-    break;
-  case TDL_DOUBLE_BUFFER:
+      break;
+    case TDL_DOUBLE_BUFFER:
       tdl_dbuffer_resize (&canv->buffer.as.double_buffer, newsize);
-    break;
-  }
+      break;
+    }
+
+  if ((canv->scrolling_region.bottom > newsize.height)
+      || (canv->scrolling_region.bottom <= newsize.height-1
+	  && canv->scrolling_region.is_whole_canvas))
+    canv->scrolling_region.bottom = newsize.height-1;
 
   canv->size = newsize;
   
+  tdl_set_cursor_pos (canv, canv->cursor);
+
   return true;
 }
 
