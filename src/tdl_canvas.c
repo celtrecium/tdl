@@ -262,7 +262,7 @@ _insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
   if (n_rows == 0)
     return;
 
-  if (reg.top + n_rows > reg.bottom)
+  if (reg.top + n_rows - 1 > reg.bottom)
     n_rows = reg.bottom - reg.top;
 
   for (i = 0; i < n_rows; ++i)
