@@ -56,6 +56,7 @@ TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
 TDL_API void tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos);
+TDL_API void tdl_move_cursor (tdl_canvas_t *canv, tdl_point_t vector);
 TDL_API void tdl_set_scrolling_region (tdl_canvas_t *canv, tdl_scroll_reg_t sr);
 TDL_API bool tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize);
 TDL_API void tdl_print (tdl_canvas_t *canv, tdl_text_t text);

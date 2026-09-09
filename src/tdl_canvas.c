@@ -20,6 +20,7 @@
 #include "tdl/tdl_buffer.h"
 #include "tdl/tdl_canvas.h"
 #include "tdl/tdl_dbuffer.h"
+#include "tdl/tdl_geometry.h"
 #include "tdl/tdl_scroll_reg.h"
 #include "tdl/tdl_style.h"
 #include "tdl/tdl_terminal.h"
@@ -94,6 +95,42 @@ tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
   canv->cursor = tdl_point_in_bounds (pos, canv->size);
 }
 
+static int
+_force_value_in_bounds (int v, int top, int bottom)
+{
+  return v < top
+    ? top
+    : v > bottom
+    ? bottom
+    : v;
+}
+
+void
+tdl_move_cursor (tdl_canvas_t *canv, tdl_point_t vector)
+{
+  tdl_point_t newpos = {
+    canv->cursor.x + vector.x,
+    canv->cursor.y + vector.y
+  };
+
+  newpos.x = _force_value_in_bounds (newpos.x, 0, (int) canv->size.width - 1);
+  newpos.y = _force_value_in_bounds (newpos.y, 0, (int) canv->size.height - 1);
+
+  if (canv->cursor.y < (int) canv->scrolling_region.bottom
+      && newpos.y > (int) canv->scrolling_region.bottom)
+    {
+      newpos.y = (int) canv->scrolling_region.bottom;
+    }
+  else if (canv->cursor.y > (int) canv->scrolling_region.top
+      && newpos.y < (int) canv->scrolling_region.top)
+    {
+      newpos.y = (int) canv->scrolling_region.top;
+    }
+
+  canv->cursor = newpos;
+}
+    
+
 static void
 _tdl_putchar(tdl_canvas_t *canv, tdl_char_t ch)
 {
@@ -118,7 +155,7 @@ tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
   switch (ch.ch[0]) {
   case '\n':
     if ((cur.y == (int)(canv->scrolling_region.bottom))
-	|| (cur.y >= (int)(canv->size.height)))
+	|| (cur.y >= (int)(canv->size.height - 1)))
       tdl_scroll_down (canv, 1);
     else
       ++canv->cursor.y;
