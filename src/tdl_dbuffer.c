@@ -92,6 +92,16 @@ tdl_dbuffer_throw_shadow (tdl_dbuffer_t *dbuff)
 }
 
 void
+tdl_dbuffer_mark_row_as_changed (tdl_dbuffer_t *dbuff, size_t row_n)
+{
+  tdl_dbufdiff_set (&dbuff->diff, (tdl_rowdiff_t) {
+      .row_number = row_n,
+      .first_modified = 0,
+      .last_modified = tdl_row_size (dbuff->main[row_n])
+    });
+}
+
+void
 tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
 {
   tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
@@ -103,11 +113,7 @@ tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
   for (i = 0; i < w; ++i)
     dbuff->main[row_n][i] = empty_char;
 
-  tdl_dbufdiff_set (&dbuff->diff, (tdl_rowdiff_t) {
-      .row_number = row_n,
-      .first_modified = 0,
-      .last_modified = w
-    });
+  tdl_dbuffer_mark_row_as_changed (dbuff, row_n);
 }
 
 void
