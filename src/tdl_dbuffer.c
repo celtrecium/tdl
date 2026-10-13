@@ -17,6 +17,7 @@
  */
 
 #include "tdl/tdl_dbuffer.h"
+#include "tdl/tdl_buffer.h"
 #include "tdl/tdl_dbufdiff.h"
 #include "tdl/tdl_geometry.h"
 #include "tdl/tdl_row.h"
@@ -101,6 +102,25 @@ tdl_dbuffer_mark_row_as_changed (tdl_dbuffer_t *dbuff, size_t row_n)
     });
 }
 
+void tdl_dbuffer_insert_rows_up (tdl_dbuffer_t *dbuff, tdl_point_t cur,
+				 tdl_scroll_reg_t reg, size_t n_rows) {
+  size_t i;
+
+  tdl_buffer_insert_rows_up (dbuff->main, cur, reg, n_rows);
+
+  for (i = reg.top; i < reg.bottom; ++i)
+    tdl_dbuffer_mark_row_as_changed (dbuff, i);
+}
+
+void tdl_dbuffer_insert_rows_down (tdl_dbuffer_t *dbuff, tdl_point_t cur,
+				   tdl_scroll_reg_t reg, size_t n_rows) {
+  size_t i;
+
+  tdl_buffer_insert_rows_down (dbuff->main, cur, reg, n_rows);
+
+  for (i = reg.top; i < reg.bottom; ++i)
+    tdl_dbuffer_mark_row_as_changed (dbuff, i);
+}
 void
 tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
 {
