@@ -21,12 +21,18 @@
 
 #include "tdl/tdl_row.h"
 #include "tdl/tdl_geometry.h"
+#include "tdl/tdl_scroll_reg.h"
 
 typedef tdl_row_t *tdl_buffer_t;
 
 tdl_buffer_t tdl_buffer (tdl_size_t size);
 bool tdl_buffer_resize (tdl_buffer_t *buffer, tdl_size_t newsize);
 bool tdl_buffer_copy (tdl_buffer_t *dest, tdl_buffer_t *src);
+
+void tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
+				tdl_scroll_reg_t reg, size_t n_rows);
+void tdl_buffer_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
+				  tdl_scroll_reg_t reg, size_t n_rows);
 void tdl_buffer_clear_row (tdl_buffer_t buff, size_t row_n);
 void tdl_buffer_clear (tdl_buffer_t buff);
 tdl_size_t tdl_buffer_size (tdl_buffer_t *buffer);

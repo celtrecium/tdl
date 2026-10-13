@@ -19,6 +19,7 @@
 #include "tdl/tdl_buffer.h"
 #include "tdl/tdl_row.h"
 #include "tdl/tdl_style.h"
+#include "tdl/tdl_scroll_reg.h"
 
 typedef struct _header
 {
@@ -162,4 +163,59 @@ tdl_buffer_clear (tdl_buffer_t buff)
 
   for (i = 0; i < h; ++i)
     tdl_buffer_clear_row (buff, i);
+}
+
+void
+tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
+			   tdl_scroll_reg_t reg, size_t n_rows)
+{
+  size_t i, j;
+  tdl_row_t emptyrow;
+
+  if (n_rows == 0)
+    return;
+  
+  if ((size_t) cur.y - n_rows < reg.top)
+    n_rows = (size_t) cur.y - reg.top;
+
+  for (i = 0; i < n_rows; ++i)
+    tdl_row_clear (buff[i + reg.top]);
+
+  for (i = 0; i < n_rows; ++i)
+    {
+      emptyrow = buff[reg.top];
+
+      for (j = reg.top + 1; j <= (size_t) cur.y; ++j)
+	buff[j - 1] = buff[j];
+
+      buff[cur.y] = emptyrow;
+    }
+}
+
+void
+tdl_buffer_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
+			     tdl_scroll_reg_t reg, size_t n_rows)
+{
+  size_t i;
+  int j;
+  tdl_row_t emptyrow;
+
+  if (n_rows == 0)
+    return;
+
+  if (reg.top + n_rows - 1 > reg.bottom)
+    n_rows = reg.bottom - reg.top;
+
+  for (i = 0; i < n_rows; ++i)
+    tdl_row_clear (buff[reg.bottom - i]);
+
+  for (i = 0; i < n_rows; ++i)
+    {
+      emptyrow = buff[reg.bottom];
+
+      for (j = (int) reg.bottom - 1; j >= cur.y; --j)
+	buff[j + 1] = buff[j];
+
+      buff[cur.y] = emptyrow;
+    }
 }
