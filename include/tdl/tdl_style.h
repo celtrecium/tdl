@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "tdl_symbols_export.h"
+#include <tdl/tdl_symbols_export.h>
 
 #define LAST_STYLES_ARG 17
 

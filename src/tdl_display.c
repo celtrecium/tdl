@@ -16,42 +16,49 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_dbuffer.h"
-#include "tdl/tdl_default_renderer.h"
-#include "tdl/tdl_renderer.h"
-#include "tdl/tdl_renderer_signals.h"
-#include "tdl/tdl_rowdiff.h"
+#include <tdl/tdl_display.h>
+#include <tdl/tdl_default_renderer.h>
 #include <stdio.h>
 
 static bool
 _tdl_render_doublebuffered_row (tdl_renderer_t renderer,
-				 tdl_row_t row,
-				 tdl_rowdiff_t rowdiff)
+                                tdl_row_t row,
+                                size_t row_n,
+                                tdl_rowdiff_t rowdiff)
 {
   size_t i;
   tdl_char_t curr, prev;
-
+  tdl_renderer_signals_t signals =
+    {
+      .set_attribute = true,
+      .set_color_bg = true,
+      .set_color_fg = true
+    };
+  bool is_first_iter = true;
+  
   if (renderer.render_before_line != NULL) {
     renderer.render_before_line((tdl_point_t) {
-	.x = (int) rowdiff.first_modified,
-	.y = (int) rowdiff.row_number },
+        .x = (int) rowdiff.first_modified,
+        .y = (int) row_n },
       renderer.optional_data);
   }
 
   for (i = rowdiff.first_modified; i <= rowdiff.last_modified; ++i)
     {
       curr = row[i];
-      
-      tdl_renderer_signals_t signals = tdl_get_renderer_signals (&curr, &prev);
+
+      if (!is_first_iter)
+        signals = tdl_get_renderer_signals (&curr, &prev);
+      else
+        is_first_iter = false;
       
       renderer.render_char((tdl_point_t) {
-	  .x = (int) i,
-	  .y = (int) rowdiff.row_number
-	},
-	signals,
-	curr,
-	renderer.optional_data);
+          .x = (int) i,
+          .y = (int) row_n
+        },
+        signals,
+        curr,
+        renderer.optional_data);
       
       prev = curr;
     }
@@ -62,39 +69,41 @@ _tdl_render_doublebuffered_row (tdl_renderer_t renderer,
 static bool
 _tdl_display_render_doublebuffered (tdl_canvas_t *canv, tdl_renderer_t renderer)
 {
-  size_t i, diffs_count;
+  size_t i, count;
   tdl_rowdiff_t rowdiff;
   tdl_row_t row;
 
   if (renderer.render_char == NULL)
     return false;
 
-  diffs_count = tdl_dbufdiff_size (canv->buffer.as.double_buffer.diff);
+  count = tdl_dbufdiff_size (canv->buffer.as.double_buffer.diff);
   
-  if(diffs_count == 0)
+  if(count == 0)
     return true;
 
   tdl_dbuffer_clarify_diff (&canv->buffer.as.double_buffer);
   
-  for (i = 0; i < diffs_count; ++i)
+  for (i = 0; i < count; ++i)
     {
       rowdiff = canv->buffer.as.double_buffer.diff[i];
-      row = canv->buffer.as.double_buffer.main[rowdiff.row_number];
+
+      if (!rowdiff.was_modified ||
+          rowdiff.first_modified > rowdiff.last_modified)
+              continue;
+
+      row = canv->buffer.as.double_buffer.main[i];
 
       if (tdl_row_is_clear(row) && renderer.render_empty_line != NULL)
         {
-	  renderer.render_empty_line((tdl_point_t) {
-	      .x = 0,
-	      .y = (int) rowdiff.row_number },
-	    renderer.optional_data);
+                renderer.render_empty_line((tdl_point_t) {
+                    .x = 0,
+                    .y = (int) i },
+                  renderer.optional_data);
 
           continue;
         }
       
-      if (rowdiff.first_modified > rowdiff.last_modified)
-        continue;
-
-      _tdl_render_doublebuffered_row (renderer, row, rowdiff);
+      _tdl_render_doublebuffered_row (renderer, row, i, rowdiff);
     }
 
   tdl_dbuffer_throw_shadow (&canv->buffer.as.double_buffer);
@@ -105,8 +114,8 @@ _tdl_display_render_doublebuffered (tdl_canvas_t *canv, tdl_renderer_t renderer)
 
 static bool
 _tdl_render_singlebuffered_row (tdl_renderer_t renderer,
-				 tdl_row_t row,
-				 size_t row_n)
+                                 tdl_row_t row,
+                                 size_t row_n)
 {
   static const tdl_renderer_signals_t signals =
     {
@@ -121,7 +130,7 @@ _tdl_render_singlebuffered_row (tdl_renderer_t renderer,
 
   if (renderer.render_before_line != NULL) {
     renderer.render_before_line((tdl_point_t) { 0, (int) row_n },
-				renderer.optional_data);
+                                renderer.optional_data);
   }
 
   for (i = 0; i < row_size; ++i)
@@ -129,11 +138,11 @@ _tdl_render_singlebuffered_row (tdl_renderer_t renderer,
       tchar = row[i];
       
       renderer.render_char((tdl_point_t) {
-	  .x = (int) i, .y = (int) row_n
-	},
-	signals,
-	tchar,
-	renderer.optional_data);
+          .x = (int) i, .y = (int) row_n
+        },
+        signals,
+        tchar,
+        renderer.optional_data);
     }
 
   return true;

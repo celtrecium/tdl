@@ -16,16 +16,26 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <u8string.h>
-#include "tdl/tdl_buffer.h"
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_dbuffer.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_scroll_reg.h"
-#include "tdl/tdl_style.h"
-#include "tdl/tdl_terminal.h"
+#include <tdl/u8utils/u8utils.h>
+#include <tdl/tdl_buffer.h>
+#include <tdl/tdl_canvas.h>
+#include <tdl/tdl_dbuffer.h>
+#include <tdl/tdl_geometry.h>
+#include <tdl/tdl_row.h>
+#include <tdl/tdl_scroll_reg.h>
+#include <tdl/tdl_style.h>
+#include <tdl/tdl_terminal.h>
+#include <tdl/tdl_text.h>
 
 #define TAB_SIZE 8
+
+static const tdl_style_t CTRL_CHAR_STYLE = {
+  .attributes = TDL_NO_ATTRIBUTES,
+  .color = {
+    .bg = TDL_RED,
+    .fg = TDL_BLACK
+  }
+};
 
 tdl_canvas_t *
 tdl_canvas_with (tdl_size_t size, tdl_buffer_type_t buffer_type)
@@ -61,7 +71,11 @@ tdl_set_scrolling_region (tdl_canvas_t *canv, tdl_scroll_reg_t sr)
 {
   if (sr.top >= canv->size.height)
     sr.top = canv->size.height - 1;
-  else if (sr.is_whole_canvas)
+
+  if (sr.bottom >= canv->size.height)
+    sr.bottom = canv->size.height - 1;
+  
+  if (sr.is_whole_canvas)
     sr = tdl_scroll_reg (canv->size.height - 1);
 
   canv->scrolling_region = sr;
@@ -82,7 +96,7 @@ tdl_destroy_canvas (tdl_canvas_t *canv)
       tdl_buffer_free (canv->buffer.as.single_buffer);
       break;
     }
-  
+
   free (canv);
 
   return true;
@@ -92,7 +106,7 @@ tdl_destroy_canvas (tdl_canvas_t *canv)
 void
 tdl_set_cursor_pos (tdl_canvas_t *canv, tdl_point_t pos)
 {
-  canv->cursor = tdl_point_in_bounds (pos, canv->size);
+  canv->cursor = tdl_point_wrap_in_size (pos, canv->size);
 }
 
 static int
@@ -129,60 +143,58 @@ tdl_move_cursor (tdl_canvas_t *canv, tdl_point_t vector)
 
   canv->cursor = newpos;
 }
-    
 
 static void
-_tdl_putchar(tdl_canvas_t *canv, tdl_char_t ch)
+_tdl_set_char_at_pos (tdl_canvas_t *canv, tdl_point_t pos, tdl_char_t ch)
 {
   switch (canv->buffer.type)
     {
     case TDL_DOUBLE_BUFFER:
-      tdl_dbuffer_set_char (&canv->buffer.as.double_buffer,
-			    canv->cursor,
-			    ch);
+      tdl_dbuffer_set_char (&canv->buffer.as.double_buffer, pos, ch);
       break;
+
     case TDL_SINGLE_BUFFER:
-      canv->buffer.as.single_buffer[canv->cursor.y][canv->cursor.x] = ch;
+      canv->buffer.as.single_buffer[pos.y][pos.x] = ch;
       break;
     }
+}
+
+static void _tdl_print_control_char (tdl_canvas_t *canv, char ch)
+{
+  char cc_sym = ch + '@';
+
+  tdl_char_t tdlchar = { .ch = { 0, 0 }, .style = CTRL_CHAR_STYLE };
+  
+  tdlchar.ch[0] = '^';
+  tdl_putchar(canv, tdlchar);
+  tdlchar.ch[0] = cc_sym;
+  tdl_putchar(canv, tdlchar);
 }
 
 void
 tdl_putchar (tdl_canvas_t *canv, tdl_char_t ch)
 {
-  tdl_point_t cur = canv->cursor;
+  if ((ch.ch[0] >= 0) && (ch.ch[0] < 32) && (ch.ch[0] != '\t'))
+    {
+      _tdl_print_control_char (canv, ch.ch[0]);
+    }
+  else if (ch.ch[0] == '\t')
+    {
+      canv->cursor.x = (canv->cursor.x / TAB_SIZE + 1) * TAB_SIZE;
+    }
+  else if (canv->cursor.x < (int) canv->size.width
+      && canv->cursor.y < (int) canv->size.height
+      && canv->cursor.x >= 0
+      && canv->cursor.y >= 0)
+    {
+      _tdl_set_char_at_pos (canv, canv->cursor, ch);
 
-  switch (ch.ch[0]) {
-  case '\n':
-    if ((cur.y == (int)(canv->scrolling_region.bottom))
-	|| (cur.y >= (int)(canv->size.height - 1)))
-      tdl_scroll_down (canv, 1);
-    else
-      ++canv->cursor.y;
-
-    return;
-  case '\r':
-    canv->cursor.x = 0;
-
-    return;
-  case '\t':
-    cur.x = (cur.x / TAB_SIZE + 1) * TAB_SIZE; 
-    tdl_set_cursor_pos (canv, cur);
-
-    return;
-  case '\b':
-    --cur.x;
-    tdl_set_cursor_pos (canv, cur);
-    _tdl_putchar (canv, tdl_char (" ", ch.style));
-    
-    return;
-  case '\a':
-    return;
-  }
-
-  _tdl_putchar (canv, ch);
-  ++cur.x;
-  tdl_set_cursor_pos (canv, cur);
+      ++canv->cursor.x;
+    }
+  else
+    {
+      ++canv->cursor.x;
+    }
 }
 
 void
@@ -190,13 +202,13 @@ tdl_print (tdl_canvas_t *canv, tdl_text_t text)
 {
   size_t i;
   char *offset_ptr = NULL;
-  u8char_t ch_buff;
-  
+  u8codept_t ch_buff;
+
   offset_ptr = text.string;
-  
-  for (i = 0; i < u8str_strlen(text.string); ++i)
+
+  for (i = 0; i < u8str_codepoints_count (text.string); ++i)
     {
-      offset_ptr = u8string_next_char(offset_ptr, &ch_buff);
+      offset_ptr = u8str_next_codepoint (offset_ptr, &ch_buff);
       tdl_putchar(canv, tdl_char (ch_buff, text.style));
     }
 }
@@ -235,9 +247,9 @@ tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize)
       break;
     }
 
-  if ((canv->scrolling_region.bottom > newsize.height)
+  if ((canv->scrolling_region.bottom > newsize.height-1)
       || (canv->scrolling_region.bottom <= newsize.height-1
-	  && canv->scrolling_region.is_whole_canvas))
+          && canv->scrolling_region.is_whole_canvas))
     canv->scrolling_region.bottom = newsize.height-1;
 
   canv->size = newsize;
@@ -247,105 +259,135 @@ tdl_canvas_resize (tdl_canvas_t *canv, tdl_size_t newsize)
   return true;
 }
 
-tdl_buffer_t
-_get_main_buffer (tdl_canvas_t *canv)
-{
-  switch (canv->buffer.type)
-    {
-    case TDL_SINGLE_BUFFER:
-      return canv->buffer.as.single_buffer;
-    case TDL_DOUBLE_BUFFER:
-      return canv->buffer.as.double_buffer.main;
-    }
-
-  return NULL;
-}
-
-void
-_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
-		 tdl_scroll_reg_t reg, size_t n_rows)
-{
-  size_t i, j;
-  tdl_row_t emptyrow;
-
-  if (n_rows == 0)
-    return;
-  
-  if ((size_t) cur.y - n_rows < reg.top)
-    n_rows = (size_t) cur.y - reg.top;
-
-  for (i = 0; i < n_rows; ++i)
-    tdl_row_clear (buff[i + reg.top]);
-
-  for (i = 0; i < n_rows; ++i)
-    {
-      emptyrow = buff[reg.top];
-
-      for (j = reg.top + 1; j <= (size_t) cur.y; ++j)
-	buff[j - 1] = buff[j];
-
-      buff[cur.y] = emptyrow;
-    }
-}
-
-void
-_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
-		   tdl_scroll_reg_t reg, size_t n_rows)
-{
-  size_t i;
-  int j;
-  tdl_row_t emptyrow;
-
-  if (n_rows == 0)
-    return;
-
-  if (reg.top + n_rows - 1 > reg.bottom)
-    n_rows = reg.bottom - reg.top;
-
-  for (i = 0; i < n_rows; ++i)
-    tdl_row_clear (buff[reg.bottom - i]);
-
-  for (i = 0; i < n_rows; ++i)
-    {
-      emptyrow = buff[reg.bottom];
-
-      for (j = (int) reg.bottom - 1; j >= cur.y; --j)
-	buff[j + 1] = buff[j];
-
-      buff[cur.y] = emptyrow;
-    }
-}
-
 void
 tdl_insert_rows (tdl_canvas_t *canv, size_t n_rows)
 {
-  tdl_buffer_t buff = _get_main_buffer (canv);
+  if ((size_t) canv->cursor.y >= canv->size.height)
+    return;
 
-  _insert_rows_down (buff, canv->cursor, canv->scrolling_region, n_rows);
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_insert_rows_down (canv->buffer.as.single_buffer,
+                                   canv->cursor,
+                                   canv->scrolling_region,
+                                   n_rows);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_insert_rows_down (&canv->buffer.as.double_buffer,
+                                    canv->cursor,
+                                    canv->scrolling_region,
+                                    n_rows);
+      break;
+    }
 }
 
 void
 tdl_delete_rows (tdl_canvas_t *canv, size_t n_rows)
 {
-  tdl_buffer_t buff = _get_main_buffer (canv);
+  tdl_scroll_reg_t tmp_scrollreg =
+    {
+      .top = (size_t) canv->cursor.y,
+      .bottom = canv->scrolling_region.bottom,
+      .is_whole_canvas = false
+    };
+  tdl_point_t tmp_cursor =
+    {
+      .x = 0,
+      .y = (int) canv->scrolling_region.bottom
+    };
 
-  _insert_rows_down (buff, canv->cursor, canv->scrolling_region, n_rows);
+  if ((size_t) canv->cursor.y >= canv->size.height - 1)
+    return;
+
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_insert_rows_up (canv->buffer.as.single_buffer,
+                                 tmp_cursor,
+                                 tmp_scrollreg,
+                                 n_rows);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_insert_rows_up (&canv->buffer.as.double_buffer,
+                                  tmp_cursor,
+                                  tmp_scrollreg,
+                                  n_rows);
+      break;
+    }
+}
+
+void
+tdl_insert_char (tdl_canvas_t *canv, tdl_char_t ch)
+{
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_insert_blank_char (canv->buffer.as.single_buffer,
+                                    canv->cursor);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_insert_blank_char (&canv->buffer.as.double_buffer,
+                                     canv->cursor);
+      break;
+    }
+
+  tdl_putchar (canv, ch);
+  --canv->cursor.x;
+}
+
+void tdl_delete_char (tdl_canvas_t *canv) {
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_delete_char (canv->buffer.as.single_buffer, canv->cursor);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_delete_char (&canv->buffer.as.double_buffer, canv->cursor);
+      break;
+    }
 }
 
 void
 tdl_scroll_up (tdl_canvas_t *canv, size_t n_rows)
 {
-  tdl_buffer_t buff = _get_main_buffer (canv);
+  tdl_point_t pos = tdl_point (0, (int) canv->scrolling_region.top);
 
-  _insert_rows_down (buff, tdl_point (0, (int) canv->scrolling_region.top),
-		     canv->scrolling_region, n_rows);
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_insert_rows_down (canv->buffer.as.single_buffer,
+                                   pos,
+                                   canv->scrolling_region,
+                                   n_rows);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_insert_rows_down (&canv->buffer.as.double_buffer,
+                                    pos,
+                                    canv->scrolling_region,
+                                    n_rows);
+      break;
+  }
 }
 
 void
 tdl_scroll_down (tdl_canvas_t *canv, size_t n_rows)
 {
-  tdl_buffer_t buff = _get_main_buffer (canv);
+  tdl_point_t pos = tdl_point (0, (int) canv->scrolling_region.bottom);
 
-  _insert_rows_up (buff, tdl_point (0, (int) canv->scrolling_region.bottom),
-		   canv->scrolling_region, n_rows);
+  switch (canv->buffer.type)
+    {
+    case TDL_SINGLE_BUFFER:
+      tdl_buffer_insert_rows_up (canv->buffer.as.single_buffer,
+                                 pos,
+                                 canv->scrolling_region,
+                                 n_rows);
+      break;
+    case TDL_DOUBLE_BUFFER:
+      tdl_dbuffer_insert_rows_up (&canv->buffer.as.double_buffer,
+                                  pos,
+                                  canv->scrolling_region,
+                                  n_rows);
+      break;
+  }
 }

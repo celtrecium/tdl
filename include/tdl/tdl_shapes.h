@@ -20,14 +20,14 @@
 #ifndef TDL_SHAPES_H
 #define TDL_SHAPES_H
 
-#include "tdl_canvas.h"
-#include "tdl_symbols_export.h"
+#include <tdl/tdl_canvas.h>
+#include <tdl/tdl_symbols_export.h>
 
 /* 1.1. Functions for drawing shapes */
 TDL_API void tdl_draw_line (tdl_canvas_t *canv, tdl_char_t ch,
-			    tdl_line_t line);
+                            tdl_line_t line);
 TDL_API void tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
-				 tdl_rectangle_t rect);
+                                 tdl_rectangle_t rect);
 TDL_API void tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
                                tdl_rectangle_t rect);
 

@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "tdl/tdl_symbols_export.h"
+#include <tdl/tdl_symbols_export.h>
 
 typedef struct tdl_scroll_reg
 {

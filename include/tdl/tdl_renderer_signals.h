@@ -19,9 +19,8 @@
 #ifndef TDL_RENDERER_SIGNALS_H
 #define TDL_RENDERER_SIGNALS_H
 
-#include <stdbool.h>
-#include "tdl/tdl_symbols_export.h"
-#include "tdl/tdl_char.h"
+#include <tdl/tdl_symbols_export.h>
+#include <tdl/tdl_char.h>
 
 typedef struct tdl_renderer_signals
 {
@@ -32,6 +31,6 @@ typedef struct tdl_renderer_signals
 
 TDL_API tdl_renderer_signals_t tdl_renderer_signals (void);    
 TDL_API tdl_renderer_signals_t tdl_get_renderer_signals (tdl_char_t *curr,
-							 tdl_char_t *prev);
+                                                         tdl_char_t *prev);
 
 #endif /* TDL_RENDERER_SIGNALS_H */

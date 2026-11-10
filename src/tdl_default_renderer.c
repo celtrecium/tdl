@@ -16,9 +16,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_default_renderer.h"
-#include "tdl/tdl_ansi_sequences.h"
-#include "tdl/tdl_renderer.h"
+#include <tdl/tdl_default_renderer.h>
+#include <tdl/tdl_ansi_sequences.h>
 #include <stdio.h>
 
 static const tdl_attributes_t _attrib_val[] = {
@@ -46,7 +45,7 @@ _tdl_print_attributes (tdl_char_t *ch)
   size_t i = 0;
   tdl_attributes_t attrib = ch->style.attributes;
 
-  fputs (ESC, stdout);
+  fputs (CSI, stdout);
   
   for (i = 0; i < _ATTRIB_NUM; ++i)
     {
@@ -61,43 +60,43 @@ static inline void
 _tdl_print_bg_color (tdl_color_t color)
 {
   if (color == TDL_DEFAULT_COLOR)
-    fputs (ESC "49" ATTRIBUTE, stdout);
+    fputs (CSI "49" ATTRIBUTE, stdout);
   else
-    printf (ESC BG_COLOR "%u" ATTRIBUTE, color);
+    printf (CSI BG_COLOR "%u" ATTRIBUTE, color);
 }
 
 static inline void
 _tdl_print_fg_color (tdl_color_t color)
 {
   if (color == TDL_DEFAULT_COLOR)
-    fputs (ESC "39" ATTRIBUTE, stdout);
+    fputs (CSI "39" ATTRIBUTE, stdout);
   else
-    printf (ESC FG_COLOR "%u" ATTRIBUTE, color);
+    printf (CSI FG_COLOR "%u" ATTRIBUTE, color);
 }
 
 static void
 _tdl_render_empty_line (tdl_point_t point, void *optional_data)
 {
-  printf (ESC "%d;1" CURSOR_POS ESC ATTRIBUTE ESC ERASE_LINE,
-	  point.y + 1);
+  printf (CSI "%d;1" CURSOR_POS CSI ATTRIBUTE CSI ERASE_LINE,
+          point.y + 1);
 
   (void)optional_data;
 }
 
 static void
 _tdl_prepare_render_new_line (tdl_point_t pos,
-			     void *optional_data)
+                             void *optional_data)
 {
   (void)optional_data;
 
-  printf (ESC "%d;%d" CURSOR_POS, pos.y + 1, pos.x + 1);
+  printf (CSI "%d;%d" CURSOR_POS, pos.y + 1, pos.x + 1);
 }
 
 static void
 _tdl_render_char (tdl_point_t point,
-		  tdl_renderer_signals_t ren_signals,
-		  tdl_char_t ch,
-		  void *optional_data)
+                  tdl_renderer_signals_t ren_signals,
+                  tdl_char_t ch,
+                  void *optional_data)
 {
   (void)optional_data;
   (void)point;

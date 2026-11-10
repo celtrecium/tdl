@@ -16,8 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_text.h"
-#include <string.h>
+#include <tdl/tdl_text.h>
 
 tdl_text_t
 tdl_text (char *string, tdl_style_t style)

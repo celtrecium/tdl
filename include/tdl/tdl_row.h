@@ -20,19 +20,22 @@
 #ifndef TDL_ROW_H
 #define TDL_ROW_H
 
-#include "tdl/tdl_symbols_export.h"
-#include "tdl/tdl_char.h"
+#include <tdl/tdl_geometry.h>
+#include <tdl/tdl_symbols_export.h>
+#include <tdl/tdl_char.h>
 
 typedef tdl_char_t* tdl_row_t;
 
-tdl_row_t tdl_row (size_t width);
+tdl_row_t tdl_row (const size_t width);
 
-size_t tdl_row_size (tdl_row_t bufstr);
-bool tdl_row_resize (tdl_row_t *bufstr, size_t newsize);
-void tdl_row_set_clear (tdl_row_t bufstr, bool is_clear);
-bool tdl_row_is_clear (tdl_row_t bufstr);
+size_t tdl_row_size (const tdl_row_t row);
+bool tdl_row_resize (tdl_row_t *row, const size_t newsize);
+void tdl_row_set_clear (tdl_row_t row, const bool is_clear);
+bool tdl_row_is_clear (const tdl_row_t row);
+void tdl_row_insert_blank_char (tdl_row_t row, const size_t index);
+void tdl_row_delete_char (tdl_row_t row, const size_t index);
 void tdl_row_clear (tdl_row_t row);
-void tdl_row_free (tdl_row_t bufstr);
-bool tdl_row_copy (tdl_row_t *dest, tdl_row_t *src);
+void tdl_row_free (tdl_row_t row);
+bool tdl_row_copy (tdl_row_t *dest, const tdl_row_t *src);
 
 #endif /* TDL_ROW_H */

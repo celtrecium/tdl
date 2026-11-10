@@ -16,13 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_dbuffer.h"
-#include "tdl/tdl_buffer.h"
-#include "tdl/tdl_dbufdiff.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_row.h"
-#include "tdl/tdl_rowdiff.h"
-#include "tdl/tdl_style.h"
+#include <tdl/tdl_dbuffer.h>
 
 tdl_dbuffer_t
 tdl_dbuffer (tdl_size_t size)
@@ -32,7 +26,7 @@ tdl_dbuffer (tdl_size_t size)
       .main = tdl_buffer (size),
       .shadow = tdl_buffer (size),
       .size = size,
-      .diff = tdl_dbufdiff ()
+      .diff = tdl_dbufdiff (size.height)
     };
 }
 
@@ -52,11 +46,9 @@ tdl_dbuffer_resize (tdl_dbuffer_t *dbuff, tdl_size_t newsize)
   if (dbuff == NULL)
     return false;
 
-  if (!tdl_buffer_resize (&dbuff->main, newsize))
-    return false;
-  
-  if (!tdl_buffer_resize (&dbuff->shadow, newsize))
-    return false;
+  tdl_buffer_resize (&dbuff->main, newsize);
+  tdl_buffer_resize (&dbuff->shadow, newsize);
+  tdl_dbufdiff_resize (&dbuff->diff, newsize.height);
 
   dbuff->size = newsize;
   
@@ -67,7 +59,7 @@ bool
 tdl_dbuffer_is_char_mod (tdl_dbuffer_t *dbuff, tdl_point_t point)
 {
   return !tdl_char_compare (&(dbuff->main[point.y][point.x]),
-			    &(dbuff->shadow[point.y][point.x]));
+                            &(dbuff->shadow[point.y][point.x]));
 }
 
 void
@@ -79,11 +71,7 @@ tdl_dbuffer_set_char (tdl_dbuffer_t *dbuff, tdl_point_t point,
   dbuff->main[point.y][point.x] = tchar;
 
   if (tdl_dbuffer_is_char_mod (dbuff, point))
-    tdl_dbufdiff_set (&dbuff->diff, (tdl_rowdiff_t) {
-	.row_number = (size_t) point.y,
-	.first_modified = (size_t) point.x,
-	.last_modified = (size_t) point.x
-      });
+    tdl_rowdiff_set(&(dbuff->diff[point.y]), (size_t) point.x);
 }
 
 void
@@ -95,32 +83,38 @@ tdl_dbuffer_throw_shadow (tdl_dbuffer_t *dbuff)
 void
 tdl_dbuffer_mark_row_as_changed (tdl_dbuffer_t *dbuff, size_t row_n)
 {
-  tdl_dbufdiff_set (&dbuff->diff, (tdl_rowdiff_t) {
-      .row_number = row_n,
-      .first_modified = 0,
-      .last_modified = tdl_row_size (dbuff->main[row_n])
-    });
+  tdl_row_set_clear (dbuff->main[row_n], false);
+
+  dbuff->diff[row_n] =
+    tdl_rowdiff_with (0, tdl_row_size (dbuff->main[row_n]) - 1);
 }
 
 void tdl_dbuffer_insert_rows_up (tdl_dbuffer_t *dbuff, tdl_point_t cur,
-				 tdl_scroll_reg_t reg, size_t n_rows) {
-  size_t i;
+                                 tdl_scroll_reg_t reg, size_t n_rows) {
+  int i;
+
+  if ((size_t) cur.y - n_rows < reg.top)
+    n_rows = (size_t) cur.y - reg.top;
 
   tdl_buffer_insert_rows_up (dbuff->main, cur, reg, n_rows);
 
-  for (i = reg.top; i < reg.bottom; ++i)
-    tdl_dbuffer_mark_row_as_changed (dbuff, i);
+  for (i = cur.y; i >= (int) reg.top; --i)
+    tdl_dbuffer_mark_row_as_changed (dbuff, (size_t) i);
 }
 
 void tdl_dbuffer_insert_rows_down (tdl_dbuffer_t *dbuff, tdl_point_t cur,
-				   tdl_scroll_reg_t reg, size_t n_rows) {
+                                   tdl_scroll_reg_t reg, size_t n_rows) {
   size_t i;
 
-  tdl_buffer_insert_rows_down (dbuff->main, cur, reg, n_rows);
+  if (reg.top + n_rows - 1 > reg.bottom)
+    n_rows = reg.bottom - reg.top;
 
-  for (i = reg.top; i < reg.bottom; ++i)
+  tdl_buffer_insert_rows_down (dbuff->main, cur, reg, n_rows);
+  
+  for (i = (size_t) cur.y; i <= reg.bottom; ++i)
     tdl_dbuffer_mark_row_as_changed (dbuff, i);
 }
+
 void
 tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
 {
@@ -145,57 +139,81 @@ tdl_dbuffer_clear (tdl_dbuffer_t *dbuff)
     tdl_dbuffer_clear_row (dbuff, i);
 }
 
-static tdl_rowdiff_t
-_clarify_rdiff_first (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+static void
+_clarify_rdiff_first (tdl_dbuffer_t *dbuff, size_t row_n)
 {
   size_t i;
   tdl_point_t curr_pt;
-
-  for (i = rowdiff.first_modified; i <= rowdiff.last_modified; ++i)
+  tdl_rowdiff_t *rowdiff = &(dbuff->diff[row_n]);
+  
+  for (i = rowdiff->first_modified; i <= rowdiff->last_modified; ++i)
     {
-      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) rowdiff.row_number };
+      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) row_n };
 
       if (tdl_dbuffer_is_char_mod (dbuff, curr_pt))
-	break;
+        break;
     }
 
-  rowdiff.first_modified = i;
-
-  return rowdiff;
+  rowdiff->first_modified = i;
 }
 
-static tdl_rowdiff_t
-_clarify_rdiff_last (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+static void
+_clarify_rdiff_last (tdl_dbuffer_t *dbuff, size_t row_n)
 {
   size_t i;
   tdl_point_t curr_pt;
+  tdl_rowdiff_t *rowdiff = &(dbuff->diff[row_n]);
 
-  for (i = rowdiff.last_modified; i >= rowdiff.first_modified; --i)
+  for (i = rowdiff->last_modified; i >= rowdiff->first_modified; --i)
     {
-      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) rowdiff.row_number };
+      curr_pt = (tdl_point_t) { .x = (int) i, .y = (int) row_n };
 
       if (tdl_dbuffer_is_char_mod (dbuff, curr_pt))
-	break;
+        break;
     }
 
-  rowdiff.last_modified = i;
-
-  return rowdiff;
+  rowdiff->last_modified = i;
 }
 
-static tdl_rowdiff_t
-_clarify_rowdiff (tdl_dbuffer_t *dbuff, tdl_rowdiff_t rowdiff)
+static void
+_clarify_rowdiff (tdl_dbuffer_t *dbuff, size_t row_n)
 {
-  return _clarify_rdiff_last(dbuff, _clarify_rdiff_first (dbuff, rowdiff));
+  tdl_rowdiff_t *rowdiff = &(dbuff->diff[row_n]);
+
+  if (rowdiff->first_modified >= dbuff->size.width)
+    rowdiff->first_modified = dbuff->size.width - 1;
+
+  if (rowdiff->last_modified >= dbuff->size.width)
+    rowdiff->last_modified = dbuff->size.width - 1;
+
+  _clarify_rdiff_first (dbuff, row_n);
+  _clarify_rdiff_last(dbuff, row_n);
 }
 
 void
 tdl_dbuffer_clarify_diff (tdl_dbuffer_t *dbuff)
 {
   size_t i;
-  size_t diffs_count = tdl_dbufdiff_size (dbuff->diff);
+  size_t count = tdl_dbufdiff_size (dbuff->diff);
   
-  for (i = 0; i < diffs_count; ++i) {
-    dbuff->diff[i] = _clarify_rowdiff (dbuff, dbuff->diff[i]);
-  }
+  for (i = 0; i < count; ++i)
+    if (dbuff->diff[i].was_modified)
+      _clarify_rowdiff (dbuff, i);
 }
+
+void
+tdl_dbuffer_insert_blank_char (tdl_dbuffer_t *dbuff, tdl_point_t point)
+{
+  if (tdl_buffer_insert_blank_char (dbuff->main, point))
+      dbuff->diff[point.y] =
+        tdl_rowdiff_with ((size_t) point.x, dbuff->size.width-1);
+}
+
+void
+tdl_dbuffer_delete_char (tdl_dbuffer_t *dbuff, tdl_point_t point)
+{
+  if (tdl_buffer_delete_char (dbuff->main, point))
+      dbuff->diff[point.y] =
+        tdl_rowdiff_with ((size_t) point.x, dbuff->size.width-1);
+}
+

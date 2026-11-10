@@ -16,8 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_rowdiff.h"
-#include "tdl/tdl_dbufdiff.h"
+#include <tdl/tdl_dbufdiff.h>
 
 typedef struct _header
 {
@@ -30,15 +29,21 @@ typedef struct _header
 #define INIT_CAP 128
 
 tdl_dbufdiff_t
-tdl_dbufdiff (void)
+tdl_dbufdiff (size_t size)
 {
-  _header_t header = { .capacity = INIT_CAP, .count = 0 };
+  _header_t header = { .capacity = size, .count = size };
   _header_t *head =
-    malloc (sizeof (_header_t) + sizeof (tdl_rowdiff_t) * INIT_CAP);
-  
-  *head = header;
+    malloc (sizeof (_header_t) + sizeof (tdl_rowdiff_t) * size);
+  tdl_dbufdiff_t data;
+  size_t i;
 
-  return DATA (head);
+  *head = header;
+  data = DATA (head);
+
+  for (i = 0; i < size; ++i)
+    data[i] = tdl_rowdiff();
+
+  return data;
 }
 
 size_t
@@ -51,35 +56,51 @@ tdl_dbufdiff_size (tdl_dbufdiff_t dbdiff)
 }
 
 bool
-tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff)
+tdl_dbufdiff_resize (tdl_dbufdiff_t *dbdiff, size_t newsize)
 {
-  _header_t *header, *tmp;
-  size_t i;
+  _header_t *header = NULL;
+  _header_t *tmp = NULL;
+  tdl_rowdiff_t rdiff = tdl_rowdiff();
 
-  header = HEADER(*dbdiff);
-
-  for (i = 0; i < header->count; ++i)
-    {
-      if ((*dbdiff)[i].row_number == rdiff.row_number)
-	{
-	  tdl_rowdiff_combine (&((*dbdiff)[i]), rdiff);
-
-	  return true;
-	}
-    }
+  size_t newcapacity, i, prevsize;
   
-  if (header->count + 1 > header->capacity) {
-    tmp = realloc (header, sizeof (_header_t)
-		   + sizeof (tdl_rowdiff_t)*header->capacity*2);
+  if (dbdiff == NULL)
+    return false;
 
-    if (tmp == NULL)
-      return false;
+  header = HEADER ((*dbdiff));
 
-    header = tmp;
-    *dbdiff = DATA (header);
-  }
+  if (header->count == newsize)
+    return true;
 
-  (*dbdiff)[header->count++] = rdiff;
+  newcapacity = header->capacity * 2;
+  prevsize = header->count;
+
+  if (header->capacity >= newsize)
+    {
+      header->count = newsize;
+    }
+  else
+    {
+      while (newcapacity < newsize) newcapacity *= 2;
+
+      tmp = realloc (header, sizeof (_header_t)
+                     + sizeof (tdl_rowdiff_t) * newcapacity);
+
+      if (tmp == NULL)
+        return false;
+
+      tmp->capacity = newcapacity;
+      tmp->count    = newsize;
+
+      *dbdiff = DATA (tmp);
+      header  = HEADER ((*dbdiff));
+    }
+
+  if (newsize > prevsize)
+    {
+      for (i = prevsize; i < newsize; ++i)
+        (*dbdiff)[i] = rdiff;
+    }
   
   return true;
 }
@@ -87,7 +108,12 @@ tdl_dbufdiff_set (tdl_dbufdiff_t *dbdiff, tdl_rowdiff_t rdiff)
 void
 tdl_dbufdiff_clear (tdl_dbufdiff_t dbdiff)
 {
-  HEADER(dbdiff)->count = 0;
+  size_t i;
+  size_t size = HEADER(dbdiff)->count;
+  tdl_rowdiff_t empty_rdiff = tdl_rowdiff();
+
+  for (i = 0; i < size; ++i)
+    dbdiff[i] = empty_rdiff;
 }
 
 void

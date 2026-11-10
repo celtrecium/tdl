@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_geometry.h"
+#include <tdl/tdl_geometry.h>
 
 tdl_line_t
 tdl_line (tdl_point_t point_a, tdl_point_t point_b)
@@ -43,7 +43,7 @@ tdl_size (size_t width, size_t height)
 }
 
 tdl_point_t
-tdl_point_in_bounds (tdl_point_t point, tdl_size_t bounds)
+tdl_point_wrap_in_size (tdl_point_t point, tdl_size_t bounds)
 {
   size_t v1d = ((size_t) point.y * bounds.width + (size_t) point.x)
     % (bounds.width*bounds.height);

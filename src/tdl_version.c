@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_version.h"
+#include <tdl/tdl_version.h>
 
 int32_t
 tdl_get_version (void)

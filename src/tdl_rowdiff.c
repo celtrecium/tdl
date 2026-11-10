@@ -16,27 +16,36 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_rowdiff.h"
-#include <stdlib.h>
+#include <tdl/tdl_rowdiff.h>
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIX(a, b) ((a) < (b) ? (a) : (b))
 
 tdl_rowdiff_t
-tdl_rowdiff (size_t row_n, size_t first_m, size_t last_m)
+tdl_rowdiff (void)
 {
-  tdl_rowdiff_t bsdiff;
+  return (tdl_rowdiff_t) {
+    .was_modified = false,
+    .first_modified = 0,
+    .last_modified = 0
+  };
+}
 
-  bsdiff.first_modified = first_m;
-  bsdiff.last_modified = last_m;
-  bsdiff.row_number = row_n;
-
-  return bsdiff;
+tdl_rowdiff_t
+tdl_rowdiff_with (size_t first_modified, size_t last_modified)
+{
+  return (tdl_rowdiff_t) {
+    .was_modified = true,
+    .first_modified = first_modified,
+    .last_modified = last_modified
+  };
 }
 
 void
 tdl_rowdiff_set (tdl_rowdiff_t *bsdiff, size_t modified)
 {
+  bsdiff->was_modified = true;
+  
   if (modified > bsdiff->last_modified)
     bsdiff->last_modified = modified;
   else if (modified < bsdiff->first_modified)
@@ -46,6 +55,7 @@ tdl_rowdiff_set (tdl_rowdiff_t *bsdiff, size_t modified)
 void
 tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff)
 {
+  dest->was_modified = true;
   dest->first_modified = MIX (dest->first_modified, rdiff.first_modified);
   dest->last_modified = MAX (dest->last_modified, rdiff.last_modified);
 }

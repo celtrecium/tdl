@@ -19,9 +19,9 @@
 #ifndef TDL_TEXT_H
 #define TDL_TEXT_H
 
-#include <u8string.h>
-#include "tdl_style.h"
-#include "tdl_symbols_export.h"
+#include <tdl/u8utils/u8utils.h>
+#include <tdl/tdl_style.h>
+#include <tdl/tdl_symbols_export.h>
 
 typedef struct tdl_text
 {
@@ -31,8 +31,8 @@ typedef struct tdl_text
 
 TDL_API tdl_text_t tdl_text (char *string, tdl_style_t style);
 
-#define tdl_default_text(string)					\
-  tdl_text (string,							\
+#define tdl_default_text(string) \
+  tdl_text (string,              \
             tdl_style (tdl_point_color (256, 256), TDL_NO_ATTRIBUTES));
 
 #endif  /* TDL_TEXT_H */

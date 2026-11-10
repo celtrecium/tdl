@@ -20,7 +20,7 @@
 #define TDL_GEOMETRY_H
 
 #include <stdlib.h>
-#include "tdl_symbols_export.h"
+#include <tdl/tdl_symbols_export.h>
 
 typedef struct tdl_point
 {
@@ -49,6 +49,6 @@ TDL_API tdl_line_t tdl_line (tdl_point_t point_a, tdl_point_t point_b);
 TDL_API tdl_rectangle_t tdl_rectangle (tdl_point_t point, tdl_size_t size);
 TDL_API tdl_point_t tdl_point (int x, int y);
 TDL_API tdl_size_t tdl_size (size_t width, size_t height);
-TDL_API tdl_point_t tdl_point_in_bounds (tdl_point_t point, tdl_size_t bounds);
+TDL_API tdl_point_t tdl_point_wrap_in_size (tdl_point_t point, tdl_size_t bounds);
 
 #endif  /* TDL_GEOMETRY_H */

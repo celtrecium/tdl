@@ -1,0 +1,3 @@
+[submodule "include/tdl/u8utils"]
+	path = include/tdl/u8utils
+	url = https://github.com/celtrecium/u8utils

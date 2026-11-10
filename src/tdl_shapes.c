@@ -16,11 +16,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-
-#include "tdl/tdl_shapes.h"
-#include "tdl/tdl_canvas.h"
 #include "tdl/tdl_geometry.h"
-#include <stdlib.h>
+#include <tdl/tdl_shapes.h>
 
 /* 1.1. Functions for drawing shapes */
 void
@@ -82,7 +79,7 @@ tdl_draw_rectangle (tdl_canvas_t *canv, tdl_char_t ch, tdl_rectangle_t rect)
     tdl_line (rect.point, tdl_point (end.x, rect.point.y)),
     tdl_line (rect.point, tdl_point (rect.point.x, end.y)),
     tdl_line (tdl_point (end.x, rect.point.y), end),
-    tdl_line (tdl_point (rect.point.x, end.y), end)
+    tdl_line (tdl_point (rect.point.x, end.y), tdl_point (end.x+1, end.y))
   };
 
   tdl_draw_lines (canv, ch, lines, 4);
@@ -92,15 +89,17 @@ void
 tdl_draw_filled_rectangle (tdl_canvas_t *canv, tdl_char_t ch,
                            tdl_rectangle_t rect)
 {
-  size_t i;
-  size_t j;
+  size_t i, j;
+  tdl_point_t pos;
   
   for (i = 0; i < rect.size.width; ++i)
     {
       for (j = 0; j < rect.size.height; ++j)
         {
-          tdl_set_cursor_pos (
-              canv, tdl_point ((int)i + rect.point.x, (int)j + rect.point.y));
+          pos = tdl_point ((int)i + rect.point.x,
+                           (int)j + rect.point.y);
+
+          tdl_set_cursor_pos (canv, pos);
 
           tdl_putchar (canv, ch);
         }

@@ -16,7 +16,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_row.h"
+#include <tdl/tdl_row.h>
+#include <string.h>
 
 typedef struct _header
 {
@@ -28,7 +29,7 @@ typedef struct _header
 #define DATA(h) ((tdl_char_t*) ((h) + 1))
 
 size_t
-tdl_row_size (tdl_row_t row)
+tdl_row_size (const tdl_row_t row)
 {
   if (row == NULL)
     return 0;
@@ -37,7 +38,7 @@ tdl_row_size (tdl_row_t row)
 }
 
 void
-tdl_row_set_clear (tdl_row_t row, bool is_empty)
+tdl_row_set_clear (tdl_row_t row, const bool is_empty)
 {
   HEADER(row)->is_clear = is_empty;
 }
@@ -56,13 +57,13 @@ tdl_row_clear (tdl_row_t row)
 }
 
 bool
-tdl_row_is_clear(tdl_row_t row)
+tdl_row_is_clear (const tdl_row_t row)
 {
   return HEADER(row)->is_clear;
 }
 
 tdl_row_t 
-tdl_row (size_t width)
+tdl_row (const size_t width)
 {
   _header_t header = { .capacity = width, .count = width, .is_clear = true };
   _header_t *head = malloc (sizeof (_header_t) + sizeof (tdl_char_t)*width);
@@ -80,13 +81,13 @@ tdl_row (size_t width)
 }
 
 void
-tdl_row_free (tdl_row_t row)
+tdl_row_free (const tdl_row_t row)
 {
   free (HEADER (row));
 }
 
 bool
-tdl_row_resize (tdl_row_t *row, size_t newsize)
+tdl_row_resize (tdl_row_t *row, const size_t newsize)
 {
   _header_t *header = NULL;
   _header_t *tmp = NULL;
@@ -113,10 +114,10 @@ tdl_row_resize (tdl_row_t *row, size_t newsize)
       while (newcapacity < newsize) newcapacity *= 2;
 
       tmp = realloc (header, sizeof (_header_t)
-		     + sizeof (tdl_char_t) * newcapacity);
+                     + sizeof (tdl_char_t) * newcapacity);
 
       if (tmp == NULL)
-	return false;
+        return false;
 
       tmp->capacity = newcapacity;
       tmp->count = newsize;
@@ -130,14 +131,44 @@ tdl_row_resize (tdl_row_t *row, size_t newsize)
       tchar = tdl_char (" ", tdl_default_style);
 
       for (i = prevcount; i < newsize; ++i)
-	(*row)[i] = tchar;
+        (*row)[i] = tchar;
     }
   
   return true;
 }
 
+void
+tdl_row_insert_blank_char (tdl_row_t row, const size_t index)
+{
+  const _header_t *row_h = HEADER (row);
+  size_t x;
+
+  if (index < row_h->count-1)
+    {
+      for (x = row_h->count-1; x > index; --x)
+        row[x] = row[x-1];
+
+      row[index] = tdl_char (" ", tdl_default_style);
+    }
+}
+
+void
+tdl_row_delete_char (tdl_row_t row, const size_t index)
+{
+  const _header_t *row_h = HEADER (row);
+  size_t x;
+
+  if (index < row_h->count-1)
+    {
+      for (x = index; x <= row_h->count-2; ++x)
+        row[x] = row[x+1];
+
+      row[row_h->count-1] = tdl_char (" ", tdl_default_style);
+    }
+}
+
 bool
-tdl_row_copy (tdl_row_t *dest, tdl_row_t *src)
+tdl_row_copy (tdl_row_t *dest, const tdl_row_t *src)
 {
   _header_t *dest_h, *src_h;
   size_t i;

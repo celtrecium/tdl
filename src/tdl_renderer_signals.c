@@ -16,8 +16,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_renderer_signals.h"
-#include "tdl/tdl_style.h"
+#include <tdl/tdl_renderer_signals.h>
+#include <tdl/tdl_style.h>
 
 tdl_renderer_signals_t
 tdl_renderer_signals (void)
@@ -36,9 +36,9 @@ tdl_get_renderer_signals (tdl_char_t *curr, tdl_char_t *prev)
   if (!prev)
     return (tdl_renderer_signals_t)
       {
-	.set_attribute = true,
-	.set_color_bg = true,
-	.set_color_fg = true
+        .set_attribute = true,
+        .set_color_bg = true,
+        .set_color_fg = true
       };
 
   tdl_renderer_signals_t signals;

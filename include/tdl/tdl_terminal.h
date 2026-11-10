@@ -20,8 +20,8 @@
 #define TDL_TERMINAL_H
 
 #include <stdbool.h>
-#include "tdl/tdl_geometry.h"
-#include "tdl_symbols_export.h"
+#include <tdl/tdl_geometry.h>
+#include <tdl/tdl_symbols_export.h>
 
 TDL_API tdl_size_t tdl_terminal_get_size (void);
 TDL_API void tdl_terminal_clear (void);

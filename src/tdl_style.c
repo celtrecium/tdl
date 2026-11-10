@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_style.h"
+#include <tdl/tdl_style.h>
 #include <stdarg.h>
 #include <string.h>
 

@@ -21,16 +21,17 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "tdl_symbols_export.h"
+#include <tdl/tdl_symbols_export.h>
 
 typedef struct tdl_rowdiff
 {
-  size_t row_number;
+  bool was_modified;
   size_t first_modified;
   size_t last_modified;
 } tdl_rowdiff_t;
 
-tdl_rowdiff_t tdl_rowdiff (size_t row_n, size_t first, size_t last);
+tdl_rowdiff_t tdl_rowdiff (void);
+tdl_rowdiff_t tdl_rowdiff_with (size_t first_modified, size_t last_modified);
 void tdl_rowdiff_set (tdl_rowdiff_t *rdiff, size_t modified);
 void tdl_rowdiff_combine (tdl_rowdiff_t *dest, tdl_rowdiff_t rdiff);
 

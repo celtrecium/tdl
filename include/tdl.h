@@ -19,14 +19,14 @@
 #ifndef TDL_H
 #define TDL_H
 
-#include "tdl/tdl_canvas.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_style.h"
-#include "tdl/tdl_text.h"
-#include "tdl/tdl_shapes.h"
-#include "tdl/tdl_display.h"
-#include "tdl/tdl_terminal.h"
-#include "tdl/tdl_char.h"
-#include "tdl/tdl_version.h"
+#include <tdl/tdl_canvas.h>
+#include <tdl/tdl_geometry.h>
+#include <tdl/tdl_style.h>
+#include <tdl/tdl_text.h>
+#include <tdl/tdl_shapes.h>
+#include <tdl/tdl_display.h>
+#include <tdl/tdl_terminal.h>
+#include <tdl/tdl_char.h>
+#include <tdl/tdl_version.h>
 
 #endif  /* TDL_H */

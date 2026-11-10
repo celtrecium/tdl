@@ -16,11 +16,9 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_terminal.h"
-#include "tdl/tdl_ansi_sequences.h"
-#include "tdl/tdl_geometry.h"
+#include <tdl/tdl_terminal.h>
+#include <tdl/tdl_ansi_sequences.h>
 #include <stdio.h>
-#include <termios.h>
 
 #if defined(__unix__)
 #  include <termios.h>

@@ -20,9 +20,8 @@
 #ifndef TDL_DBUFFER_H
 #define TDL_DBUFFER_H
 
-#include "tdl/tdl_symbols_export.h"
-#include "tdl/tdl_buffer.h"
-#include "tdl/tdl_dbufdiff.h"
+#include <tdl/tdl_buffer.h>
+#include <tdl/tdl_dbufdiff.h>
 
 typedef struct tdl_dbuffer
 {
@@ -37,13 +36,15 @@ void tdl_dbuffer_free (tdl_dbuffer_t *dbuff);
 bool tdl_dbuffer_resize (tdl_dbuffer_t *dbuff, tdl_size_t newsize);
 
 void tdl_dbuffer_set_char (tdl_dbuffer_t *dbuff, tdl_point_t point,
-			   tdl_char_t tchar);
+                           tdl_char_t tchar);
 void tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n);
 void tdl_dbuffer_mark_row_as_changed (tdl_dbuffer_t *dbuff, size_t row_n);
 void tdl_dbuffer_insert_rows_up (tdl_dbuffer_t *dbuff, tdl_point_t cur,
-				 tdl_scroll_reg_t reg, size_t n_rows);
+                                 tdl_scroll_reg_t reg, size_t n_rows);
 void tdl_dbuffer_insert_rows_down (tdl_dbuffer_t *dbuff, tdl_point_t cur,
-				   tdl_scroll_reg_t reg, size_t n_rows);
+                                   tdl_scroll_reg_t reg, size_t n_rows);
+void tdl_dbuffer_insert_blank_char (tdl_dbuffer_t *dbuff, tdl_point_t point);
+void tdl_dbuffer_delete_char (tdl_dbuffer_t *dbuff, tdl_point_t point);
 void tdl_dbuffer_clear (tdl_dbuffer_t *dbuff);
 bool tdl_dbuffer_is_char_mod (tdl_dbuffer_t *dbuff, tdl_point_t point);
 void tdl_dbuffer_throw_shadow (tdl_dbuffer_t *dbuff);

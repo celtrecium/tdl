@@ -19,7 +19,7 @@
 #ifndef TDL_DEFAULT_RENDERER_H
 #define TDL_DEFAULT_RENDERER_H
 
-#include "tdl_renderer.h"
+#include <tdl/tdl_renderer.h>
 
 TDL_API extern tdl_renderer_t tdl_default_renderer;
 

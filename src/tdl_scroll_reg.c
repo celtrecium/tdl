@@ -16,7 +16,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_scroll_reg.h"
+#include <tdl/tdl_scroll_reg.h>
 
 tdl_scroll_reg_t
 tdl_scroll_reg (size_t canv_height)

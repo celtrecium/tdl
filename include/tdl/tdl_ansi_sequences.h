@@ -20,7 +20,8 @@
 #ifndef TDL_ANSI_SEQUENCES_H
 #define TDL_ANSI_SEQUENCES_H
 
-#define ESC         "\033["
+#define ESC         "\033"
+#define CSI         ESC "["
 #define ATTRIBUTE   "m"
 #define ERASE_LINE  "K"
 #define BG_COLOR    "48;5;"
@@ -31,11 +32,11 @@
 #define CURSOR_FWD  "C"
 #define CURSOR_BACK "D"
 #define COLUMN      "G"
-#define CLEAR       ESC "49;39" ATTRIBUTE ESC CURSOR_POS ESC "2J"
-#define ALTERNATE_SCREEN_ENABLE  ESC "?1049h"
-#define ALTERNATE_SCREEN_DISABLE ESC "?1049l"
-#define CURSOR_ENABLE  ESC "?25h"
-#define CURSOR_DISABLE ESC "?25l"
-#define GET_CURSOR_POS ESC "6n"
+#define CLEAR       CSI "49;39" ATTRIBUTE CSI CURSOR_POS CSI "2J"
+#define ALTERNATE_SCREEN_ENABLE  CSI "?1049h"
+#define ALTERNATE_SCREEN_DISABLE CSI "?1049l"
+#define CURSOR_ENABLE  CSI "?25h"
+#define CURSOR_DISABLE CSI "?25l"
+#define GET_CURSOR_POS CSI "6n"
 
 #endif  /* TDL_ANSI_SEQUENCES_H */

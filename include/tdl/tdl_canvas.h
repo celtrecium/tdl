@@ -19,11 +19,12 @@
 #ifndef TDL_CANVAS_H
 #define TDL_CANVAS_H
 
-#include "tdl/tdl_scroll_reg.h"
-#include "tdl_symbols_export.h"
-#include "tdl/tdl_geometry.h"
-#include "tdl/tdl_dbuffer.h"
-#include "tdl/tdl_text.h"
+#include <tdl/tdl_char.h>
+#include <tdl/tdl_symbols_export.h>
+#include <tdl/tdl_scroll_reg.h>
+#include <tdl/tdl_geometry.h>
+#include <tdl/tdl_dbuffer.h>
+#include <tdl/tdl_text.h>
 
 typedef enum tdl_buffer_type {
   TDL_SINGLE_BUFFER,
@@ -51,7 +52,7 @@ typedef struct tdl_canvas
 /* 1. Create/destroy canvas functions */
 TDL_API tdl_canvas_t *tdl_canvas (void);
 TDL_API tdl_canvas_t *tdl_canvas_with (tdl_size_t size,
-				       tdl_buffer_type_t buffer_type);
+                                       tdl_buffer_type_t buffer_type);
 TDL_API bool tdl_destroy_canvas (tdl_canvas_t *canv);
 
 /* 2. Canvas setters */
@@ -66,5 +67,7 @@ TDL_API void tdl_scroll_up (tdl_canvas_t *canv, size_t n_rows);
 TDL_API void tdl_scroll_down (tdl_canvas_t *canv, size_t n_rows);
 TDL_API void tdl_insert_rows (tdl_canvas_t *canv, size_t n_rows);
 TDL_API void tdl_delete_rows (tdl_canvas_t *canv, size_t n_rows);
+TDL_API void tdl_delete_char (tdl_canvas_t *canv);
+TDL_API void tdl_insert_char (tdl_canvas_t *canv, tdl_char_t ch);
 
 #endif /* TDL_CANVAS_H */

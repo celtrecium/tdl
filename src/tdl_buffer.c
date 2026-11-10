@@ -16,10 +16,10 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include "tdl/tdl_buffer.h"
-#include "tdl/tdl_row.h"
-#include "tdl/tdl_style.h"
-#include "tdl/tdl_scroll_reg.h"
+#include <tdl/tdl_buffer.h>
+#include <tdl/tdl_row.h>
+#include <tdl/tdl_style.h>
+#include <tdl/tdl_scroll_reg.h>
 
 typedef struct _header
 {
@@ -75,36 +75,39 @@ tdl_buffer_resize(tdl_buffer_t *buffer, tdl_size_t newsize)
   if (header->count >= newsize.height)
     {
       for (i = 0; i < newsize.height; ++i)
-	if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
-	  return false;
+        if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
+          return false;
 
       for (i = newsize.height; i < header->count; ++i)
-	tdl_row_free ((*buffer)[i]);
+        {
+          tdl_row_free ((*buffer)[i]);
+          (*buffer)[i] = NULL;
+        }
     }
   else
     {
       if (header->capacity < newsize.height)
-	{
-	  while (newcapacity < newsize.height) newcapacity *= 2;
+        {
+          while (newcapacity < newsize.height) newcapacity *= 2;
 
-	  tmp = realloc (header, sizeof (_header_t)
-			 + sizeof (tdl_row_t) * newcapacity);
+          tmp = realloc (header, sizeof (_header_t)
+                         + sizeof (tdl_row_t) * newcapacity);
 
-	  if (tmp == NULL)
-	    return false;
-	  
-	  header = tmp;
-	  *buffer = DATA (header);
+          if (tmp == NULL)
+            return false;
+          
+          header = tmp;
+          *buffer = DATA (header);
 
-	  header->capacity = newcapacity;
-	}
+          header->capacity = newcapacity;
+        }
 
       for (i = 0; i < header->count; ++i)
-	if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
-	  return false;
+        if (!tdl_row_resize (&((*buffer)[i]), newsize.width))
+          return false;
 
       for (i = header->count; i < newsize.height; ++i)
-	(*buffer)[i] = tdl_row (newsize.width);
+        (*buffer)[i] = tdl_row (newsize.width);
     }
 
   header->count = newsize.height;
@@ -167,7 +170,7 @@ tdl_buffer_clear (tdl_buffer_t buff)
 
 void
 tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
-			   tdl_scroll_reg_t reg, size_t n_rows)
+                           tdl_scroll_reg_t reg, size_t n_rows)
 {
   size_t i, j;
   tdl_row_t emptyrow;
@@ -175,7 +178,7 @@ tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
   if (n_rows == 0)
     return;
   
-  if ((size_t) cur.y - n_rows < reg.top)
+  if (cur.y - (int) n_rows < (int) reg.top)
     n_rows = (size_t) cur.y - reg.top;
 
   for (i = 0; i < n_rows; ++i)
@@ -186,7 +189,7 @@ tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
       emptyrow = buff[reg.top];
 
       for (j = reg.top + 1; j <= (size_t) cur.y; ++j)
-	buff[j - 1] = buff[j];
+        buff[j - 1] = buff[j];
 
       buff[cur.y] = emptyrow;
     }
@@ -194,7 +197,7 @@ tdl_buffer_insert_rows_up (tdl_buffer_t buff, tdl_point_t cur,
 
 void
 tdl_buffer_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
-			     tdl_scroll_reg_t reg, size_t n_rows)
+                             tdl_scroll_reg_t reg, size_t n_rows)
 {
   size_t i;
   int j;
@@ -214,8 +217,37 @@ tdl_buffer_insert_rows_down (tdl_buffer_t buff, tdl_point_t cur,
       emptyrow = buff[reg.bottom];
 
       for (j = (int) reg.bottom - 1; j >= cur.y; --j)
-	buff[j + 1] = buff[j];
+        buff[j + 1] = buff[j];
 
       buff[cur.y] = emptyrow;
     }
+}
+
+bool
+tdl_buffer_insert_blank_char (tdl_buffer_t buff, tdl_point_t point)
+{
+  _header_t *buff_h = HEADER (buff);
+
+  if (point.x >= (int) buff_h->size.width ||
+      point.y >= (int) buff_h->size.height)
+    return false;
+
+  tdl_row_insert_blank_char (buff[point.y], (size_t) point.x);
+
+  return true;
+
+}
+
+bool
+tdl_buffer_delete_char (tdl_buffer_t buff, tdl_point_t point)
+{
+  _header_t *buff_h = HEADER (buff);
+
+  if (point.x >= (int) buff_h->size.width ||
+      point.y >= (int) buff_h->size.height)
+    return false;
+
+  tdl_row_delete_char (buff[point.y], (size_t) point.x);
+
+  return true;
 }

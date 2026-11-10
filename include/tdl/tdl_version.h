@@ -19,7 +19,7 @@
 #ifndef TDL_VERSION_H
 #define TDL_VERSION_H
 
-#include "tdl/tdl_symbols_export.h"
+#include <tdl/tdl_symbols_export.h>
 #include <stdint.h>
 
 /*
@@ -30,7 +30,7 @@
  *   - Patch number
  */
 
-#define TDL_VERSION 0x00030100
+#define TDL_VERSION 0x00040000
 
 TDL_API int32_t tdl_get_version (void);
 
