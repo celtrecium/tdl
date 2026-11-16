@@ -57,9 +57,26 @@ _tdl_print_attributes (tdl_char_t *ch)
 }
 
 static inline void
-_tdl_print_bg_color (tdl_color_t color)
+_tdl_print_fg_rgb_color (tdl_rgb_t rgb)
 {
-  if (color == TDL_DEFAULT_COLOR)
+  printf (CSI FG_RGB_COLOR "%u;%u;%u" ATTRIBUTE, rgb.r, rgb.g, rgb.b);
+}
+
+static inline void
+_tdl_print_bg_rgb_color (tdl_rgb_t rgb)
+{
+  printf (CSI BG_RGB_COLOR "%u;%u;%u" ATTRIBUTE, rgb.r, rgb.g, rgb.b);
+}
+
+static inline void
+_tdl_print_bg_color (tdl_char_color_t ch_color)
+{
+  const tdl_color_t color   = ch_color.fg;
+  const tdl_rgb_t color_rgb = ch_color.fg_rgb;
+
+  if (color == TDL_RGB_COLOR)
+    _tdl_print_bg_rgb_color (color_rgb);
+  else if (color == TDL_DEFAULT_COLOR)
     fputs (CSI "49" ATTRIBUTE, stdout);
   else if (color >= TDL_BLACK && color <= TDL_WHITE)
     printf (CSI "4%u" ATTRIBUTE, color);
@@ -70,9 +87,14 @@ _tdl_print_bg_color (tdl_color_t color)
 }
 
 static inline void
-_tdl_print_fg_color (tdl_color_t color)
+_tdl_print_fg_color (tdl_char_color_t ch_color)
 {
-  if (color == TDL_DEFAULT_COLOR)
+  const tdl_color_t color   = ch_color.fg;
+  const tdl_rgb_t color_rgb = ch_color.fg_rgb;
+
+  if (color == TDL_RGB_COLOR)
+    _tdl_print_fg_rgb_color (color_rgb);
+  else if (color == TDL_DEFAULT_COLOR)
     fputs (CSI "39" ATTRIBUTE, stdout);
   else if (color >= TDL_BLACK && color <= TDL_WHITE)
     printf (CSI "3%u" ATTRIBUTE, color);
@@ -113,10 +135,10 @@ _tdl_render_char (tdl_point_t point,
     _tdl_print_attributes (&ch);
 
   if (ren_signals.set_color_bg)
-    _tdl_print_bg_color (ch.style.color.bg);
+    _tdl_print_bg_color (ch.style.color);
 
   if (ren_signals.set_color_fg)
-    _tdl_print_fg_color (ch.style.color.fg);
+    _tdl_print_fg_color (ch.style.color);
 
   fputs (ch.ch, stdout);
 }

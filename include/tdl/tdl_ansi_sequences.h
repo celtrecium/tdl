@@ -26,6 +26,8 @@
 #define ERASE_LINE  "K"
 #define BG_COLOR    "48;5;"
 #define FG_COLOR    "38;5;"
+#define FG_RGB_COLOR "38;2;"
+#define BG_RGB_COLOR "48;2;"
 #define CURSOR_POS  "H"
 #define CURSOR_UP   "A"
 #define CURSOR_DOWN "B"
