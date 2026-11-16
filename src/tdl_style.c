@@ -83,8 +83,10 @@ tdl_style_compare (tdl_style_t *first, tdl_style_t *second)
     && (tdl_rgb_compare(first->color.fg_rgb, second->color.fg_rgb));
   
   return first->attributes == second->attributes
-    && (is_both_bg_rgb_equal || (first->color.bg == second->color.bg))
-    && (is_both_fg_rgb_equal || (first->color.fg == second->color.fg));
+    && (is_both_bg_rgb_equal ||
+       (is_both_bg_rgb && (first->color.bg == second->color.bg)))
+    && (is_both_fg_rgb_equal ||
+       (is_both_fg_rgb && (first->color.fg == second->color.fg)));
 }
 
 tdl_rgb_t
