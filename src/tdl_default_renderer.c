@@ -61,6 +61,10 @@ _tdl_print_bg_color (tdl_color_t color)
 {
   if (color == TDL_DEFAULT_COLOR)
     fputs (CSI "49" ATTRIBUTE, stdout);
+  else if (color >= TDL_BLACK && color <= TDL_WHITE)
+    printf (CSI "4%u" ATTRIBUTE, color);
+  else if (color >= TDL_GREY && color <= TDL_BRIGHT_WHITE)
+    printf (CSI "10%u" ATTRIBUTE, color);
   else
     printf (CSI BG_COLOR "%u" ATTRIBUTE, color);
 }
@@ -70,6 +74,10 @@ _tdl_print_fg_color (tdl_color_t color)
 {
   if (color == TDL_DEFAULT_COLOR)
     fputs (CSI "39" ATTRIBUTE, stdout);
+  else if (color >= TDL_BLACK && color <= TDL_WHITE)
+    printf (CSI "3%u" ATTRIBUTE, color);
+  else if (color >= TDL_GREY && color <= TDL_BRIGHT_WHITE)
+    printf (CSI "9%u" ATTRIBUTE, color);
   else
     printf (CSI FG_COLOR "%u" ATTRIBUTE, color);
 }
