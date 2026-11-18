@@ -48,7 +48,8 @@ tdl_row_clear (tdl_row_t row)
 {
   size_t i;
   size_t w = HEADER(row)->count;
-  tdl_char_t tchar = tdl_char (" ", tdl_default_style);
+  u8codept_t empty_codept = { ' ', 0 };
+  tdl_char_t tchar = tdl_char (empty_codept, tdl_default_style);
   
   HEADER(row)->is_clear = true;
 
@@ -67,7 +68,8 @@ tdl_row (const size_t width)
 {
   _header_t header = { .capacity = width, .count = width, .is_clear = true };
   _header_t *head = malloc (sizeof (_header_t) + sizeof (tdl_char_t)*width);
-  tdl_char_t tchar = tdl_char (" ", tdl_default_style);
+  u8codept_t empty_codept = { ' ', 0 };
+  tdl_char_t tchar = tdl_char (empty_codept, tdl_default_style);
   tdl_row_t row = NULL;
   size_t i;
 
@@ -92,6 +94,7 @@ tdl_row_resize (tdl_row_t *row, const size_t newsize)
   _header_t *header = NULL;
   _header_t *tmp = NULL;
   tdl_char_t tchar;
+  u8codept_t empty_codept = { ' ', 0 };
   size_t newcapacity, i, prevcount;
   
   if (row == NULL)
@@ -128,7 +131,7 @@ tdl_row_resize (tdl_row_t *row, const size_t newsize)
 
   if (newsize > prevcount)
     {
-      tchar = tdl_char (" ", tdl_default_style);
+      tchar = tdl_char (empty_codept, tdl_default_style);
 
       for (i = prevcount; i < newsize; ++i)
         (*row)[i] = tchar;
@@ -141,6 +144,7 @@ void
 tdl_row_insert_blank_char (tdl_row_t row, const size_t index)
 {
   const _header_t *row_h = HEADER (row);
+  u8codept_t empty_codept = { ' ', 0 };
   size_t x;
 
   if (index < row_h->count-1)
@@ -148,7 +152,7 @@ tdl_row_insert_blank_char (tdl_row_t row, const size_t index)
       for (x = row_h->count-1; x > index; --x)
         row[x] = row[x-1];
 
-      row[index] = tdl_char (" ", tdl_default_style);
+      row[index] = tdl_char (empty_codept, tdl_default_style);
     }
 }
 
@@ -156,6 +160,7 @@ void
 tdl_row_delete_char (tdl_row_t row, const size_t index)
 {
   const _header_t *row_h = HEADER (row);
+  u8codept_t empty_codept = { ' ', 0 };
   size_t x;
 
   if (index < row_h->count-1)
@@ -163,7 +168,7 @@ tdl_row_delete_char (tdl_row_t row, const size_t index)
       for (x = index; x <= row_h->count-2; ++x)
         row[x] = row[x+1];
 
-      row[row_h->count-1] = tdl_char (" ", tdl_default_style);
+      row[row_h->count-1] = tdl_char (empty_codept, tdl_default_style);
     }
 }
 

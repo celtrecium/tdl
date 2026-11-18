@@ -151,7 +151,8 @@ tdl_buffer_clear_row (tdl_buffer_t buff, size_t row_n)
 {
   size_t i;
   size_t w = tdl_row_size (buff[row_n]);
-  tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
+  u8codept_t empty_codept = { ' ', 0 };
+  tdl_char_t empty_char = tdl_char (empty_codept, tdl_default_style);
 
   tdl_row_set_clear(buff[row_n], true);
 

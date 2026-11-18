@@ -118,7 +118,8 @@ void tdl_dbuffer_insert_rows_down (tdl_dbuffer_t *dbuff, tdl_point_t cur,
 void
 tdl_dbuffer_clear_row (tdl_dbuffer_t *dbuff, size_t row_n)
 {
-  tdl_char_t empty_char = tdl_char (" ", tdl_default_style);
+  u8codept_t empty_codept = { ' ', 0 };
+  tdl_char_t empty_char = tdl_char (empty_codept, tdl_default_style);
   size_t i;
   size_t w = tdl_row_size (dbuff->main[row_n]);
 
