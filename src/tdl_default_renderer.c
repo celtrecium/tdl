@@ -71,8 +71,8 @@ _tdl_print_bg_rgb_color (tdl_rgb_t rgb)
 static inline void
 _tdl_print_bg_color (tdl_char_color_t ch_color)
 {
-  const tdl_color_t color   = ch_color.fg;
-  const tdl_rgb_t color_rgb = ch_color.fg_rgb;
+  const tdl_color_t color   = ch_color.bg;
+  const tdl_rgb_t color_rgb = ch_color.bg_rgb;
 
   if (color == TDL_RGB_COLOR)
     _tdl_print_bg_rgb_color (color_rgb);
